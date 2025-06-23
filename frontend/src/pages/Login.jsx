@@ -39,7 +39,7 @@ const Login = () => {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'radial-gradient(#ffffff66 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(#ffffff80 1px, transparent 1px)',
           backgroundSize: '20px 20px',
           zIndex: 0,
           pointerEvents: 'none',
