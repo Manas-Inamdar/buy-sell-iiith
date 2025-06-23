@@ -64,6 +64,7 @@ app.post('/generate-text', async (req, res) => {
 
         res.json({ generatedText: text });
     } catch (error) {
+        console.error('Error in /generate-text:', error); // Add this for debugging
         res.status(500).json({ error: error.message });
     }
 });

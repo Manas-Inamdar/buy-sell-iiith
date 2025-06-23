@@ -16,7 +16,7 @@ const Login = () => {
   }, [setToken, navigate]);
 
   const handleCASLogin = () => {
-    window.location.href = '/api/user/cas-login';
+    window.location.href = 'http://localhost:4000/api/user/cas-login';
   };
 
   return (

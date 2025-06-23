@@ -3,8 +3,14 @@ import { login, register, getUserByEmail } from '../controllers/userhandler.js';
 import User from '../models/usermodel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'; // <-- Add this import
+import CAS from 'cas-authentication';
 
 const userRouter = express.Router();
+const cas = new CAS({
+  cas_url: process.env.CAS_URL,
+  service_url: process.env.SERVICE_URL,
+  cas_version: '3.0'
+});
 
 userRouter.post('/login', login);
 userRouter.post('/register', register);
@@ -13,9 +19,9 @@ userRouter.get('/email/:email', getUserByEmail);
 
 // UPDATED CAS LOGIN ROUTE
 userRouter.get('/cas-login', async (req, res) => {
-    if (req.session && req.session.cas_user) {
-        const email = req.session.cas_user;
-        // Optionally extract firstname/lastname from CAS attributes if available
+    const casUser = req.session && req.session['cas_user'];
+    if (casUser) {
+        const email = casUser;
         let user = await User.findOne({ email });
         if (!user) {
             user = new User({ email });
@@ -24,7 +30,7 @@ userRouter.get('/cas-login', async (req, res) => {
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: '1s' }
+            { expiresIn: '10m' }
         );
         const frontendUrl = 'http://localhost:5173';
         return res.redirect(`${frontendUrl}/login?token=${token}`);
