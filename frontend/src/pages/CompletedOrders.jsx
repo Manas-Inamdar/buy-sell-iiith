@@ -1,0 +1,83 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { ShopContext } from '../context/ShopContext';
+import { useContext } from 'react';
+
+const PendingOrders = () => {
+  const [orders, setOrders] = useState([]);
+  const { token } = useContext(ShopContext);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchCompletedOrders = async () => {
+      try {
+        setLoading(true);
+        const decodedToken = jwtDecode(token);
+        const email = decodedToken.email;
+        console.log(email);
+
+        const response = await axios.get('/api/order/list');
+        // or, if JWT required:
+        // const config = { headers: { Authorization: `Bearer ${token}` } };
+        // const response = await axios.get('/api/order/list', config);
+        const allOrders = response.data;
+
+        const filteredOrders = allOrders.filter(order =>
+          order.status === 'Completed' && order.buyer === email
+        );
+
+        setOrders(filteredOrders);
+      } catch (error) {
+        console.error('Failed to fetch completed orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchCompletedOrders();
+    }
+  }, [token]);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Completed Orders</h1>
+      {orders.length === 0 ? (
+        <p className="text-gray-600 text-center">No completed orders to display</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {orders.map((order) => {
+            // const otp = localStorage.getItem(`order_${order._id}`);
+            return (
+              <div key={order._id} className="bg-white shadow-lg rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-2">Order ID: {order._id}</h2>
+                <p className="text-gray-600 mb-2">Buyer: {order.buyer}</p>
+                <p className="text-gray-600 mb-4">Seller: {order.seller}</p>
+                <div className="space-y-4">
+                  {order.items.map((item, index) => (
+                    <div key={index} className="flex items-center gap-4">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div>
+                        <p className="text-lg font-semibold text-gray-800">{item.product.name}</p>
+                        <p className="text-gray-600">Quantity: {item.quantity}</p>
+                        <p className="text-gray-600">Price: ₹{item.product.price}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className={`mt-4 ${order.status === 'Pending' ? 'text-yellow-600 font-bold' : 'text-gray-600'}`}>Status: {order.status}</p>
+                {/* {otp && <p className="mt-2 text-red-600 font-bold">OTP: {otp}</p>} */}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PendingOrders;
