@@ -4,6 +4,7 @@ import User from '../models/usermodel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'; // <-- Add this import
 import CAS from 'cas-authentication';
+import auth from '../middleware/auth.js';
 
 const userRouter = express.Router();
 const cas = new CAS({
@@ -18,21 +19,22 @@ userRouter.post('/register', register);
 userRouter.get('/email/:email', getUserByEmail);
 
 // UPDATED CAS LOGIN ROUTE
-userRouter.get('/cas-login', async (req, res) => {
+userRouter.get('/cas-login', cas.bounce, async (req, res) => {
     const casUser = req.session && req.session['cas_user'];
     if (casUser) {
         const email = casUser;
         let user = await User.findOne({ email });
+        const frontendUrl = 'http://localhost:5173';
         if (!user) {
-            user = new User({ email });
-            await user.save();
+            // Redirect to registration page with email as query param
+            return res.redirect(`${frontendUrl}/register?email=${encodeURIComponent(email)}`);
         }
+        // User exists, proceed as before
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '10m' }
         );
-        const frontendUrl = 'http://localhost:5173';
         return res.redirect(`${frontendUrl}/login?token=${token}`);
     } else {
         res.status(401).json({ message: 'CAS authentication failed' });
@@ -84,6 +86,25 @@ userRouter.put('/:userId', async (req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
+});
+
+userRouter.post('/register-details', async (req, res) => {
+    const { email, firstname, lastname, contactnumber } = req.body;
+    let user = await User.findOne({ email });
+    if (!user) {
+        user = new User({ email, firstname, lastname, contactnumber });
+    } else {
+        // Update the existing user with new details
+        user.firstname = firstname;
+        user.lastname = lastname;
+        user.contactnumber = contactnumber;
+    }
+    await user.save();
+    return res.json({ success: true, user });
+});
+
+userRouter.get('/profile', auth, async (req, res) => {
+    res.json(req.user);
 });
 
 

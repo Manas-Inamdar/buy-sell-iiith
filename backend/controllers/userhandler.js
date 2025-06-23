@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password, "login");
         if (!email || !password) {
             return res.status(400).json({ message: "Please fill all the fields" });
         }
@@ -20,22 +19,23 @@ const login = async (req, res) => {
         }
         const token = jwt.sign(
             { id: user._id, firstname: user.firstname, lastname: user.lastname, age: user.age, contactnumber: user.contactnumber, email: user.email },
-            process.env.JWT_SECRET, // Use env variable here
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        res.status(200).json({ status: "success", message: "User logged in successfully", user, token });
+        const { password: pwd, ...userWithoutPassword } = user.toObject();
+        res.status(200).json({ status: "success", message: "User logged in successfully", user: userWithoutPassword, token });
     }
     catch (error) {
         console.error(error);  
         res.status(500).json({ message: "Something went wrong" });
-    };
+    }
 }
 
 const register = async (req, res) => {
     try {
-        const { firstname, lastname, age, contactNumber, email, password } = req.body;
+        const { firstname, lastname, age, contactnumber, email, password } = req.body;
         console.log(req.body);
-        console.log(firstname, lastname, age, contactNumber, email, password, "register");
+        console.log(firstname, lastname, age, contactnumber, email, password, "register");
 
         if (!firstname || !email || !password) {
             return res.status(400).json({ message: "Please fill all the fields" });
@@ -50,7 +50,7 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "Invalid email" });
         }
 
-        if (!validator.isMobilePhone(contactNumber, 'en-IN')) { // for India
+        if (!validator.isMobilePhone(contactnumber, 'en-IN')) { // for India
             return res.status(400).json({ message: "Invalid contact number" });
         }
 
@@ -65,7 +65,7 @@ const register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new userModel({ firstname, lastname, contactnumber : contactNumber, age, email, password: hashedPassword });
+        const newUser = new userModel({ firstname, lastname, contactnumber, age, email, password: hashedPassword });
         await newUser.save();
 
         const token = jwt.sign(

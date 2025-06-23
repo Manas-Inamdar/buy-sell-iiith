@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     lastname: {
         type: String,
     },
+    contactnumber: { type: String }, // <-- Add this line
     cartdata: [
         {
             product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },

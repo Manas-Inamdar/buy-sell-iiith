@@ -7,6 +7,8 @@ const upload = multer({ storage });
 const uploadImage = async (req, res) => {
   try {
     const file = req.file;
+    const userId = req.user._id; // <-- You can use this if needed
+
     if (!file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
@@ -17,6 +19,7 @@ const uploadImage = async (req, res) => {
         if (error) {
           return res.status(500).json({ message: 'Cloudinary upload failed', error });
         }
+        // You can save userId and result.secure_url to your DB if you want
         res.status(200).json({ url: result.secure_url });
       }
     );

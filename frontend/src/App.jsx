@@ -14,6 +14,7 @@ import GeminiChatbot from './pages/Chatbot.jsx';
 import ProtectedRoute from './components/Protected.jsx';
 import Cart from './pages/Cart.jsx';
 import SoldItems from './pages/SoldItems.jsx';
+import Register from './pages/Register';
 
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
       {!hideNavbar && <Navbar />}
       <Routes>
         <Route path='/login' element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>

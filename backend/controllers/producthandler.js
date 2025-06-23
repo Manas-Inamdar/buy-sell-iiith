@@ -1,7 +1,8 @@
 import productModel from '../models/productmodel.js';
 
 const addproduct = async (req, res) => {
-    const { title, price, description, category, subCategory, buyerEmail, imageUrl } = req.body;
+    const { title, price, description, category, subCategory, imageUrl } = req.body;
+    const buyerEmail = req.user.email; // Use authenticated user's email
 
     try {
         if (!title || !price || !description || !category || !subCategory || !imageUrl) {
@@ -19,7 +20,7 @@ const addproduct = async (req, res) => {
             description: description,
             category: category,
             subCategory: subCategory,
-            buyer_email: buyerEmail,
+            buyer_email: buyerEmail, // Use from JWT, not body
             image: imageUrl,
         });
 

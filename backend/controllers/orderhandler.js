@@ -3,7 +3,8 @@ import Order from '../models/orders.js';
 
 const addOrder = async (req, res) => {
     try {
-        const { email, cart } = req.body;
+        const email = req.user.email; // Use authenticated user's email
+        const { cart } = req.body;
         console.log(email, cart, "addOrder");
 
         const orders = [];
@@ -79,8 +80,7 @@ const generatedOrderOTP = async (req, res) => {
 
 const pendingSellingOrders = async (req, res) => {
     try {
-        const { email } = req.query;
-        console.log(email, "email");
+        const email = req.user.email; // Use authenticated user's email
         const pendingOrders = await Order.find({ seller: email, status: 'Pending' }).populate('items.product');
         res.status(200).json(pendingOrders);
     } catch (error) {
@@ -91,7 +91,7 @@ const pendingSellingOrders = async (req, res) => {
 
 const completedOrders = async (req, res) => {
     try {
-        const { email } = req.query;
+        const email = req.user.email; // Use authenticated user's email
         const completedOrders = await Order.find({ seller: email, status: 'Completed' }).populate('items.product');
         res.status(200).json(completedOrders);
     } catch (error) {

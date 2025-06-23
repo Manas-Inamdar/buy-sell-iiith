@@ -3,8 +3,9 @@ const router = express.Router();
 import userModel from '../models/usermodel.js';
 import productModel from '../models/productmodel.js';
 import mongoose from 'mongoose';
+import auth from '../middleware/auth.js';
 
-router.post('/add', async (req, res) => {
+router.post('/add', auth, async (req, res) => {
     try {
       const { productdata, quantity, email } = req.body;
   
@@ -51,7 +52,7 @@ router.post('/add', async (req, res) => {
     }
   });
   
-  router.post('/remove', async (req, res) => {
+  router.post('/remove', auth, async (req, res) => {
     try {
         const { productId, email } = req.body;
         console.log("Attempting to remove product:", { productId, email });
@@ -97,14 +98,14 @@ router.post('/add', async (req, res) => {
     }
 });
 
-router.post('/update', async (req, res) => {
+router.post('/update', auth, async (req, res) => {
     try {
         const { product, quantity } = req.body;
         if (!req.user) {
             return res.status(401).json({ message: 'User not authenticated' });
         }
 
-        const user = await userModel.findById(req.user._id);
+        const user = await userModel.findById(req.user._id).populate('cartdata.product');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -124,7 +125,7 @@ router.post('/update', async (req, res) => {
 }
 );
 
-router.get('/list', async (req, res) => {
+router.get('/list', auth, async (req, res) => {
     try {
         const { email } = req.query;
 
@@ -145,7 +146,7 @@ router.get('/list', async (req, res) => {
     }
 });
 
-router.post('/clear', async (req, res) => {
+router.post('/clear', auth, async (req, res) => {
     try {
         const { email } = req.body;
         console.log(req.body);

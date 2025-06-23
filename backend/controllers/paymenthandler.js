@@ -8,6 +8,8 @@ const razorpay = new Razorpay({
 export const createOrder = async (req, res) => {
   try {
     const { amount } = req.body; // amount in INR
+    const userId = req.user._id; // <-- You can use this if needed
+
     const options = {
       amount: amount * 100, // amount in paise
       currency: "INR",

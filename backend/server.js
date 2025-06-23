@@ -31,7 +31,10 @@ const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 //Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.urlencoded({ extended: true }));
 connectDb();
 
@@ -41,8 +44,6 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false } // set to true if using HTTPS
 }));
-
-app.use(cas.bounce);
 
 //API Endpoints
 app.get('/', (req, res) => res.status(404).send('Hello World'));
@@ -100,12 +101,14 @@ app.post('/verify-recaptcha', async (req, res) => {
 
 // Example: Protect a route with CAS
 app.get('/cas-protected', cas.bounce, (req, res) => {
-  // After successful CAS login, user info is in req.session[cas.session_name]
   res.json({
     message: 'You are authenticated via CAS!',
     user: req.session[cas.session_name]
   });
 });
+
+// Place this LAST, after all API routes:
+app.use(cas.bounce);
 
 app.listen(port, () => console.log(`Listening on localhost: ${port}`));
 

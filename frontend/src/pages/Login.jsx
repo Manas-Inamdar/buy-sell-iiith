@@ -1,19 +1,17 @@
-import { useEffect, useContext } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShopContext } from '../context/ShopContext';
 
 const Login = () => {
-  const { setToken } = useContext(ShopContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
-      setToken(token);
+      localStorage.setItem('token', token);
       navigate('/');
     }
-  }, [setToken, navigate]);
+  }, [navigate]);
 
   const handleCASLogin = () => {
     window.location.href = 'http://localhost:4000/api/user/cas-login';
