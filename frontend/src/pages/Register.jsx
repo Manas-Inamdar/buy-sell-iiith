@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -10,9 +10,16 @@ const Register = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!email) {
+      navigate('/login');
+    }
+  }, [email, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    // Optionally validate contact number here
     try {
       const res = await fetch('http://localhost:4000/api/user/register-details', {
         method: 'POST',

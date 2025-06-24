@@ -81,6 +81,28 @@ const register = async (req, res) => {
     }
 };
 
+// PATCH /api/user/profile
+const completeProfile = async (req, res) => {
+    try {
+        const { firstname, lastname, contactnumber, age } = req.body;
+        const userId = req.user.id; // from JWT
+
+        if (!firstname || !lastname || !contactnumber || !age) {
+            return res.status(400).json({ message: "Please fill all the fields" });
+        }
+
+        const user = await userModel.findByIdAndUpdate(
+            userId,
+            { firstname, lastname, contactnumber, age },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Profile updated", user });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 const getUserByEmail = async (req, res) => {
     const { email } = req.params;
     console.log(email , "email");
@@ -100,4 +122,4 @@ const getUserByEmail = async (req, res) => {
 };
 
 
-export { login, register , getUserByEmail};
+export { login, register , getUserByEmail, completeProfile };

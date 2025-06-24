@@ -17,14 +17,25 @@ const Navbar = () => {
     };
 
     const fetchCartCount = async () => {
-        if (user && user.email) {
+        const token = localStorage.getItem('token');
+        if (token) {
             try {
-                const response = await axios.get(`/api/cart/list?email=${user.email}`);
+                const response = await axios.get('/api/cart/list', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 const cartData = response.data;
                 const totalQuantity = cartData.reduce((acc, item) => acc + item.quantity, 0);
                 setCartCount(totalQuantity);
             } catch (error) {
-                console.error('Failed to fetch cart data:', error);
+                if (error.response && error.response.status === 401) {
+                    setToken(null);
+                    localStorage.removeItem('token');
+                    navigate('/login');
+                } else {
+                    console.error('Failed to fetch cart data:', error);
+                }
             }
         }
     };

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,8 +14,36 @@ const Login = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ticket = params.get('ticket');
+    if (ticket) {
+      // POST ticket and service to backend
+      axios
+        .post('http://localhost:4000/api/user/cas-validate', {
+          ticket,
+          service: 'http://localhost:5173/login',
+        })
+        .then((res) => {
+          if (res.data.success) {
+            localStorage.setItem('token', res.data.token);
+            if (res.data.isNewUser) {
+              // Redirect to Register page with email in query
+              navigate(`/register?email=${res.data.user.email}`);
+            } else {
+              navigate('/');
+            }
+          }
+        })
+        .catch(() => {
+          // handle error (optional)
+        });
+    }
+  }, [navigate]);
+
   const handleCASLogin = () => {
-    window.location.href = 'http://localhost:4000/api/user/cas-login';
+    const service = encodeURIComponent('http://localhost:5173/login');
+    window.location.href = `https://login.iiit.ac.in/cas/login?service=${service}`;
   };
 
   return (
@@ -24,7 +53,8 @@ const Login = () => {
         inset: 0,
         minHeight: '100vh',
         minWidth: '100vw',
-        background: 'linear-gradient(120deg, #6a11cb 0%, #2575fc 50%, #43e97b 100%)',
+        background:
+          'linear-gradient(120deg, #6a11cb 0%, #2575fc 50%, #43e97b 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

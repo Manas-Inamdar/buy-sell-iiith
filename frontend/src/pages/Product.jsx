@@ -68,7 +68,6 @@ const Product = () => {
     setLoading(true);
     const cartData = {
       productdata,
-      email,
       quantity: 1,
     };
 

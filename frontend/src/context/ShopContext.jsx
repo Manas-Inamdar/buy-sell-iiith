@@ -38,8 +38,9 @@ const ShopContextProvider = (props) => {
                     localStorage.removeItem("token");
                     navigate('/login');
                 } else {
-                    setUser({ id: decodedToken.id, email: decodedToken.email }); 
-                    console.log(user , "user");
+                    const newUser = { id: decodedToken.id, email: decodedToken.email };
+                    setUser(newUser);
+                    console.log(newUser, "user");
                     // Adjust based on your token payload
                 }
             } catch (error) {

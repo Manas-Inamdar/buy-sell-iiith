@@ -9,108 +9,88 @@ import router from './controllers/carthandler.js';
 import orderRouter from './routes/orderrouter.js';
 import axios from 'axios';
 import uploadRouter from './routes/uploadrouter.js';
-import CAS from 'cas-authentication';
 import paymentRouter from './routes/paymentrouter.js';
 import session from 'express-session';
 
-//App Config
 const app = express();
 const port = process.env.PORT || 4000;
 
-// CAS configuration (replace with your IIIT CAS server URL)
-const cas = new CAS({
-  cas_url: process.env.CAS_URL,
-  service_url: process.env.SERVICE_URL,
-  cas_version: '3.0'
-});
-
-// Use environment variables for API keys
-const API_KEY = process.env.GOOGLE_GENAI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
-
-//Middlewares
+// Middleware
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.urlencoded({ extended: true }));
+
+// DB Connection
 connectDb();
 
+// Sessions
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // set to true if using HTTPS
+  cookie: { secure: false } // Set to true if using HTTPS
 }));
 
-//API Endpoints
-app.get('/', (req, res) => res.status(404).send('Hello World'));
-app.use('/api/user', userRoutes);
+// Routers
+app.use('/api/user', userRoutes);       // includes CAS route /api/user/cas-login
 app.use('/api/product', productRouter);
 app.use('/api/cart', router);
 app.use('/api/order', orderRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/payment', paymentRouter);
 
+// Gemini Text Generation
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY);
 app.post('/generate-text', async (req, res) => {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const { prompt } = req.body;
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const { prompt } = req.body;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-        res.json({ generatedText: text });
-    } catch (error) {
-        console.error('Error in /generate-text:', error); // Add this for debugging
-        res.status(500).json({ error: error.message });
-    }
+    res.json({ generatedText: text });
+  } catch (error) {
+    console.error('Error in /generate-text:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
+// Recaptcha Verification
 app.post('/verify-recaptcha', async (req, res) => {
-    const { captchaToken } = req.body;
+  const { captchaToken } = req.body;
 
-    if (!captchaToken) {
-        return res.status(400).json({ success: false, message: 'Captcha token is missing' });
+  if (!captchaToken) {
+    return res.status(400).json({ success: false, message: 'Captcha token is missing' });
+  }
+
+  try {
+    const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: captchaToken,
+      },
+    });
+
+    const data = response.data;
+
+    if (data.success) {
+      res.status(200).json({ success: true, message: 'Captcha verified successfully' });
+    } else {
+      res.status(400).json({ success: false, message: 'Captcha verification failed', errors: data['error-codes'] });
     }
-
-    try {
-        const url = `https://www.google.com/recaptcha/api/siteverify`;
-        const response = await axios.post(url, null, {
-            params: {
-                secret: RECAPTCHA_SECRET_KEY,
-                response: captchaToken,
-            },
-        });
-
-        const data = response.data;
-
-        if (data.success) {
-            res.status(200).json({ success: true, message: 'Captcha verified successfully' });
-        } else {
-            res.status(400).json({ success: false, message: 'Captcha verification failed', errors: data['error-codes'] });
-        }
-    } catch (error) {
-        console.error('Error verifying captcha:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
+  } catch (error) {
+    console.error('Error verifying captcha:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 
-// Example: Protect a route with CAS
-app.get('/cas-protected', cas.bounce, (req, res) => {
-  res.json({
-    message: 'You are authenticated via CAS!',
-    user: req.session[cas.session_name]
-  });
-});
+// Default route
+app.get('/', (req, res) => res.status(404).send('Hello World'));
 
-// Place this LAST, after all API routes:
-app.use(cas.bounce);
-
-app.listen(port, () => console.log(`Listening on localhost: ${port}`));
-
-
-
+// Start server
+app.listen(port, () => console.log(`✅ Server running at http://localhost:${port}`));

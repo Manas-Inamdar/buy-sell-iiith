@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 
@@ -6,10 +6,13 @@ const Profile = () => {
   const { token, user } = useContext(ShopContext);
   const navigate = useNavigate();
 
-  if (!token) {
-    navigate('/login');
-    return null;
-  }
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
+  if (!token) return null;
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">

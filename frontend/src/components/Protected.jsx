@@ -15,13 +15,14 @@ const ProtectedRoute = () => {
       
       if (decodedToken.exp < currentTime) {
         setToken(null);
+        localStorage.removeItem('token');
         return false;
       }
       
       return true;
     } catch (error) {
-      console.error('Invalid token:', error);
       setToken(null);
+      localStorage.removeItem('token');
       return false;
     }
   };

@@ -13,7 +13,7 @@ const CompletedSold = () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const response = await axios.get(`/api/order/completed?email=${user.email}`, config);
+        const response = await axios.get('/api/order/completed', config);
         setOrders(response.data);
       } catch (error) {
         console.error('Failed to fetch completed orders:', error);

@@ -24,10 +24,12 @@ const GeminiChatbot = () => {
     setIsLoading(true);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('/generate-text', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify({ prompt: input })
       });

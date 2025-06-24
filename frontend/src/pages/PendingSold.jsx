@@ -16,7 +16,7 @@ const PendingSold = () => {
         setLoading(true);
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const response = await axios.get(`/api/order/pending?email=${user.email}`, config);
+        const response = await axios.get('/api/order/pending', config);
         setOrders(response.data);
       } catch (error) {
         console.error('Failed to fetch pending orders:', error);

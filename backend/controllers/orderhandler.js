@@ -1,42 +1,44 @@
 import bcrypt from 'bcrypt';
 import Order from '../models/orders.js';
+import Product from '../models/productmodel.js'; // Import Product model
 
 const addOrder = async (req, res) => {
     try {
-        const email = req.user.email; // Use authenticated user's email
+        const email = req.user.email; // Authenticated user's email
         const { cart } = req.body;
-        console.log(email, cart, "addOrder");
 
         const orders = [];
         const plainOtps = [];
 
         for (const item of cart) {
-            const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
-            const hashedOtp = await bcrypt.hash(otp, 10); 
+            // Lookup product in DB to get the seller's email
+            const product = await Product.findById(item.product._id);
+            if (!product) continue; // skip if not found
+
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            const hashedOtp = await bcrypt.hash(otp, 10);
 
             orders.push({
                 buyer: email,
-                seller: item.product.buyer_email, 
+                seller: product.seller_email, // Use seller email from DB
                 items: [{
-                    product: item.product,
+                    product: product._id,
                     quantity: item.quantity
                 }],
                 status: 'Pending',
-                otp: hashedOtp, 
+                otp: hashedOtp,
                 createdAt: new Date()
             });
 
-            plainOtps.push(otp); 
+            plainOtps.push(otp);
         }
 
         const createdOrders = await Order.insertMany(orders);
 
         const responseOrders = createdOrders.map((order, index) => ({
             order_id: order._id,
-            otp: plainOtps[index] 
+            otp: plainOtps[index]
         }));
-
-        console.log(responseOrders, "responseOrders");
 
         res.status(200).json({ message: 'Orders created successfully', orders: responseOrders });
     } catch (error) {

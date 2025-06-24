@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { ShopContext } from '../context/ShopContext';
 
@@ -11,25 +10,10 @@ const SellPage = () => {
         price: '',
         category: '',
         subCategory: '',
-        buyerEmail: '',
         imageUrl: '',
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decodedToken = jwtDecode(token);
-                setFormData((prevFormData) => ({
-                    ...prevFormData,
-                    buyerEmail: decodedToken.email,
-                }));
-            } catch (error) {
-                console.error('Failed to decode token:', error);
-            }
-        }
-    }, [token]);
 
     const categories = {
         Electronics: ['Mobile Phones', 'Laptops', 'Cameras'],
@@ -63,19 +47,23 @@ const SellPage = () => {
         setError('');
 
         try {
-            const response = await axios.post('/api/product/add', formData);
-            console.log(response);
-
+            const response = await axios.post(
+                '/api/product/add',
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             setSuccess('Item submitted successfully!');
             setError('');
-            console.log('Response:', response.data);
             setFormData({
                 title: '',
                 description: '',
                 price: '',
                 category: '',
                 subCategory: '',
-                buyerEmail: '',
                 imageUrl: '',
             });
         } catch (error) {

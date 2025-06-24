@@ -1,112 +1,98 @@
 import express from 'express';
-import { login, register, getUserByEmail } from '../controllers/userhandler.js';
+import { completeProfile, getUserByEmail } from '../controllers/userhandler.js';
 import User from '../models/usermodel.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken'; // <-- Add this import
+import jwt from 'jsonwebtoken';
 import CAS from 'cas-authentication';
 import auth from '../middleware/auth.js';
+import fetch from 'node-fetch'; // If not installed, run: npm install node-fetch
 
 const userRouter = express.Router();
+
+// ✅ CAS setup (only ONE route needed)
 const cas = new CAS({
   cas_url: process.env.CAS_URL,
-  service_url: process.env.SERVICE_URL,
+  service_url: process.env.SERVICE_URL, // Must be http://localhost:4000/api/user/cas-login
   cas_version: '3.0'
 });
 
-userRouter.post('/login', login);
-userRouter.post('/register', register);
+// PATCH: Complete user profile after CAS login
+userRouter.patch('/profile', auth, completeProfile);
 
-userRouter.get('/email/:email', getUserByEmail);
+// GET: Get user by email (optional)
+userRouter.get('/get/:email', getUserByEmail);
 
-// UPDATED CAS LOGIN ROUTE
-userRouter.get('/cas-login', cas.bounce, async (req, res) => {
-    const casUser = req.session && req.session['cas_user'];
-    if (casUser) {
-        const email = casUser;
-        let user = await User.findOne({ email });
-        const frontendUrl = 'http://localhost:5173';
-        if (!user) {
-            // Redirect to registration page with email as query param
-            return res.redirect(`${frontendUrl}/register?email=${encodeURIComponent(email)}`);
-        }
-        // User exists, proceed as before
-        const token = jwt.sign(
-            { id: user._id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: '10m' }
-        );
-        return res.redirect(`${frontendUrl}/login?token=${token}`);
-    } else {
-        res.status(401).json({ message: 'CAS authentication failed' });
-    }
-});
-
-userRouter.get('/:userId', async (req, res) => {
-    const { userId } = req.params;
-    try {
-        const user = await User.findById(userId); 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json(user); 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-userRouter.put('/:userId', async (req, res) => {
-    const { userId } = req.params;
-    const { firstName, lastName, email, contactNumber, password, confirmPassword, age } = req.body;
-    console.log(req.body);
-    if (password && password !== confirmPassword) {
-        return res.status(400).json({ message: 'Passwords do not match' });
-    }
-
-    try {
-        const user = await User.findById(userId); 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        user.firstname = firstName || user.firstname;
-        user.lastname = lastName || user.lastname;
-        user.email = email || user.email;
-        user.contactnumber = contactNumber || user.contactnumber;
-        user.age = age || user.age;
-
-        if (password) {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(password, salt);
-        }
-
-        const updatedUser = await user.save(); 
-        res.status(201).json(updatedUser); 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-userRouter.post('/register-details', async (req, res) => {
-    const { email, firstname, lastname, contactnumber } = req.body;
-    let user = await User.findOne({ email });
-    if (!user) {
-        user = new User({ email, firstname, lastname, contactnumber });
-    } else {
-        // Update the existing user with new details
-        user.firstname = firstname;
-        user.lastname = lastname;
-        user.contactnumber = contactnumber;
-    }
-    await user.save();
-    return res.json({ success: true, user });
-});
-
+// GET: Get logged-in user profile
 userRouter.get('/profile', auth, async (req, res) => {
-    res.json(req.user);
+  res.json(req.user);
 });
 
+// POST: CAS validation
+userRouter.post('/cas-validate', async (req, res) => {
+  const { ticket, service } = req.body;
+  if (!ticket || !service) {
+    return res.status(401).json({ success: false, message: "Missing ticket or service URL" });
+  }
+
+  try {
+    const casValidationUrl = `https://login.iiit.ac.in/cas/validate?ticket=${ticket}&service=${service}`;
+    const response = await fetch(casValidationUrl);
+    const casData = await response.text();
+
+    if (casData.startsWith("yes")) {
+      const [, username] = casData.split("\n");
+      let user = await User.findOne({ email: username });
+      let isNewUser = false;
+      if (!user) {
+        user = await User.create({ email: username });
+        isNewUser = true;
+      }
+
+      const token = jwt.sign(
+        { id: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+      res.json({ success: true, token, user: { email: user.email }, isNewUser });
+    } else {
+      res.status(401).json({ success: false, message: "Invalid CAS ticket" });
+    }
+  } catch (error) {
+    console.error("CAS validation error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// POST: Register user details
+userRouter.post('/register-details', async (req, res) => {
+  const { email, firstname, lastname, contactnumber } = req.body;
+  if (!email || !firstname || !lastname || !contactnumber) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  try {
+    const user = await User.findOneAndUpdate(
+      { email },
+      { firstname, lastname, contactnumber },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET: Get user by email
+userRouter.get('/email/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 export default userRouter;
-

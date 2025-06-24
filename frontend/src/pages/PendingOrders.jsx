@@ -11,21 +11,13 @@ const PendingOrders = () => {
   const [otps, setOtps] = useState({});
 
   useEffect(() => {
-    const fetchCompletedOrders = async () => {
+    const fetchPendingOrders = async () => {
       try {
         setLoading(true);
-        const decodedToken = jwtDecode(token);
-        const email = decodedToken.email;
-        console.log(email);
-
-        const response = await axios.get('/api/order/list');
-        const allOrders = response.data;
-
-        const filteredOrders = allOrders.filter(order =>
-          order.status === 'Pending' && order.buyer === email
-        );
-
-        setOrders(filteredOrders);
+        const response = await axios.get('/api/order/pending', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setOrders(response.data);
       } catch (error) {
         console.error('Failed to fetch pending orders:', error);
       } finally {
@@ -34,13 +26,15 @@ const PendingOrders = () => {
     };
 
     if (token) {
-      fetchCompletedOrders();
+      fetchPendingOrders();
     }
   }, [token]);
 
   const handleGenerateOTP = async (orderId) => {
     try {
-      const response = await axios.post(`/api/order/generate-otp/${orderId}`);
+      const response = await axios.post(`/api/order/generate-otp/${orderId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const { otp } = response.data;
       
       setOtps(prev => ({

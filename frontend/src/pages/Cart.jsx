@@ -13,8 +13,12 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartData = async () => {
       try {
-        const response = await axios.get(`/api/cart/list?email=${user.email}`);
-        console.log(response.data, "response.data");
+        const token = localStorage.getItem('token');
+        const response = await axios.get('/api/cart/list', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCart(response.data);
         calculateTotal(response.data);
       } catch (error) {
@@ -45,25 +49,35 @@ const Cart = () => {
 
   const handleRemoveItem = async (productId) => {
     try {
-        const response = await axios.post('/api/cart/remove', { productId, email: user.email });
-        console.log(response.data);
+      const token = localStorage.getItem('token');
+      const response = await axios.post('/api/cart/remove', { productId }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
 
-        const itemToRemove = cart.find(item => item.product._id === productId);
-        const itemQuantity = itemToRemove ? itemToRemove.quantity : 0;
+      const itemToRemove = cart.find(item => item.product._id === productId);
+      const itemQuantity = itemToRemove ? itemToRemove.quantity : 0;
 
-        const updatedCart = cart.filter(item => item.product._id !== productId);
-        setCart(updatedCart);
-        calculateTotal(updatedCart);
-        setCartCount(prev => prev - itemQuantity);
-        console.log(cartcount);
+      const updatedCart = cart.filter(item => item.product._id !== productId);
+      setCart(updatedCart);
+      calculateTotal(updatedCart);
+      setCartCount(prev => prev - itemQuantity);
+      console.log(cartcount);
     } catch (error) {
-        console.error('Failed to remove item from cart:', error);
+      console.error('Failed to remove item from cart:', error);
     }
-};
+  };
 
   const handleIncrementQuantity = async (productdata) => {
     try {
-      await axios.post('/api/cart/add', { productdata, email: user.email, quantity: 1 });
+      const token = localStorage.getItem('token');
+      await axios.post('/api/cart/add', { productdata, quantity: 1 }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const updatedCart = cart.map(item =>
         item.product._id === productdata._id ? { ...item, quantity: item.quantity + 1 } : item
       );
@@ -78,9 +92,14 @@ const Cart = () => {
 
   const handleDecrementQuantity = async (productdata) => {
     try {
+      const token = localStorage.getItem('token');
       const currentQuantity = cart.find(item => item.product._id === productdata._id).quantity;
       if (currentQuantity > 1) {
-        await axios.post('/api/cart/add', { productdata, email: user.email, quantity: -1 });
+        await axios.post('/api/cart/add', { productdata, quantity: -1 }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const updatedCart = cart.map(item =>
           item.product._id === productdata._id ? { ...item, quantity: item.quantity - 1 } : item
         );
@@ -94,9 +113,14 @@ const Cart = () => {
     }
   };
 
-  const addToOrders = async ({ email, cart }) => {
+  const addToOrders = async ({ cart }) => {
     try {
-      const response = await axios.post('/api/order/add', { email, cart });
+      const token = localStorage.getItem('token');
+      const response = await axios.post('/api/order/add', { cart }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data.orders;
     } catch (error) {
       console.error('Failed to add order:', error);
@@ -105,10 +129,15 @@ const Cart = () => {
   };
 
   const handleBuyNow = async () => {
-    const orders = await addToOrders({ email: user.email, cart });
+    const orders = await addToOrders({ cart });
     if (orders.length > 0) {
       try {
-        await axios.post('/api/cart/clear', { email: user.email });
+        const token = localStorage.getItem('token');
+        await axios.post('/api/cart/clear', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCart([]);
         setTotal(0);  
         setCartCount(0);

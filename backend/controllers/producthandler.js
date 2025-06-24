@@ -20,14 +20,14 @@ const addproduct = async (req, res) => {
             description: description,
             category: category,
             subCategory: subCategory,
-            buyer_email: buyerEmail, // Use from JWT, not body
             image: imageUrl,
+            buyer_email: buyerEmail, // <-- This is required by your schema
         });
 
         const savedProduct = await newProduct.save();
         res.status(201).json(savedProduct);
     } catch (error) {
-        console.error(error);  // Log the error for debugging
+        console.error(error);
         res.status(500).json({ message: "Something went wrong" });
     }
 };
