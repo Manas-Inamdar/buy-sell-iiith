@@ -15,6 +15,7 @@ const ALL_CATEGORIES = [
   "Sports",
   "Stationery",
   "Miscellaneous"
+  
 ];
 
 const CATEGORY_TYPE_MAP = {
