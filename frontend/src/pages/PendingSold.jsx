@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { ShopContext } from '../context/ShopContext';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const PendingSold = () => {
   const { user } = useContext(ShopContext);
@@ -36,15 +35,8 @@ const PendingSold = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const response = await axios.post('/api/order/verify', { orderId, otp: inputOTP }, config);
-      if (response.data.success == true) {
-        toast.success('Order completed successfully!', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+      if (response.data.success === true) {
+        toast.success('Order completed successfully!');
         setOrders(orders.filter(order => order._id !== orderId));
       }
     } catch (error) {
@@ -97,7 +89,7 @@ const PendingSold = () => {
               ))}
             </div>
             <div className="mt-6 pt-4 border-t border-gray-100">
-              <div className="flex flex-col  items-center gap-4">
+              <div className="flex flex-col items-center gap-4">
                 <input
                   type="text"
                   placeholder="Enter OTP"
@@ -117,7 +109,6 @@ const PendingSold = () => {
           </div>
         ))}
       </div>
-      <ToastContainer />
     </div>
   );
 };

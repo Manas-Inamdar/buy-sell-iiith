@@ -4,6 +4,7 @@ import Title from '../components/Title';
 import { assets } from '../frontend_assets/assets';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const { cartcount, setCartCount, currency, user } = useContext(ShopContext);
@@ -23,6 +24,7 @@ const Cart = () => {
         calculateTotal(response.data);
       } catch (error) {
         console.error('Failed to fetch cart data:', error);
+        toast.error("Failed to fetch cart data");
       }
     };
 
@@ -67,6 +69,7 @@ const Cart = () => {
       console.log(cartcount);
     } catch (error) {
       console.error('Failed to remove item from cart:', error);
+      toast.error("Failed to remove item from cart");
     }
   };
 
@@ -87,6 +90,7 @@ const Cart = () => {
       console.log(cartcount);
     } catch (error) {
       console.error('Failed to update quantity:', error);
+      toast.error("Failed to update quantity");
     }
   };
 
@@ -110,6 +114,7 @@ const Cart = () => {
       }
     } catch (error) {
       console.error('Failed to update quantity:', error);
+      toast.error("Failed to update quantity");
     }
   };
 
@@ -124,6 +129,7 @@ const Cart = () => {
       return response.data.orders;
     } catch (error) {
       console.error('Failed to add order:', error);
+      toast.error("Failed to place order");
       return [];
     }
   };
@@ -143,6 +149,7 @@ const Cart = () => {
         setCartCount(0);
       } catch (error) {
         console.error('Failed to clear cart:', error);
+        toast.error("Failed to clear cart after purchase");
       }
     }
   };

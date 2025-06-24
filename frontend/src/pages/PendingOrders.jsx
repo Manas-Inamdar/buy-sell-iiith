@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 import { ShopContext } from '../context/ShopContext';
-import { useContext } from 'react';
+import { toast } from 'react-toastify';
 
 const PendingOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -20,6 +19,7 @@ const PendingOrders = () => {
         setOrders(response.data);
       } catch (error) {
         console.error('Failed to fetch pending orders:', error);
+        toast.error("Failed to fetch pending orders");
       } finally {
         setLoading(false);
       }
@@ -36,15 +36,23 @@ const PendingOrders = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       const { otp } = response.data;
-      
       setOtps(prev => ({
         ...prev,
         [orderId]: otp
       }));
     } catch (error) {
       console.error('Failed to generate OTP:', error);
+      toast.error("Failed to generate OTP");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="text-center text-gray-500 py-8">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

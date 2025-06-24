@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { ShopContext } from '../context/ShopContext';
+import { toast } from "react-toastify";
 
 const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -17,6 +18,7 @@ const CompletedOrders = () => {
         setOrders(response.data);
       } catch (error) {
         console.error('Failed to fetch completed orders:', error);
+        toast.error("Failed to fetch completed orders");
       } finally {
         setLoading(false);
       }
@@ -30,7 +32,9 @@ const CompletedOrders = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Completed Orders</h1>
-      {orders.length === 0 ? (
+      {loading ? (
+        <p className="text-center text-gray-500">Loading...</p>
+      ) : orders.length === 0 ? (
         <p className="text-gray-600 text-center">No completed orders to display</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,22 +1,26 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { ShopContext } from '../context/ShopContext';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const CompletedSold = () => {
   const { user } = useContext(ShopContext);
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCompletedOrders = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
         const response = await axios.get('/api/order/completed', config);
         setOrders(response.data);
       } catch (error) {
         console.error('Failed to fetch completed orders:', error);
+        toast.error("Failed to fetch completed sales");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -24,6 +28,16 @@ const CompletedSold = () => {
       fetchCompletedOrders();
     }
   }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 rounded-lg">
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          Loading...
+        </h3>
+      </div>
+    );
+  }
 
   if (orders.length === 0) {
     return (

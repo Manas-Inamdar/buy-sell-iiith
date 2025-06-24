@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { toast } from "react-toastify";
 
 const GeminiChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +26,7 @@ const GeminiChatbot = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/generate-text', {
+      const response = await fetch('/api/generate-text', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,6 +48,7 @@ const GeminiChatbot = () => {
       ]);
     } catch (error) {
       console.error('Error generating response:', error);
+      toast.error("Failed to get AI response");
       setMessages(prev => [
         ...prev, 
         { text: 'Sorry, something went wrong.', sender: 'ai' }
@@ -104,7 +106,7 @@ const GeminiChatbot = () => {
             <input 
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Type your message..."
               className="flex-grow p-2 border rounded-l-lg"
               disabled={isLoading}

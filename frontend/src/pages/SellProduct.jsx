@@ -14,6 +14,7 @@ const SellPage = () => {
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const categories = {
         Electronics: ['Mobile Phones', 'Laptops', 'Cameras'],
@@ -23,10 +24,11 @@ const SellPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormData((prev) => ({
+            ...prev,
             [name]: value,
-        });
+            ...(name === 'category' ? { subCategory: '' } : {}),
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -38,13 +40,14 @@ const SellPage = () => {
             return;
         }
 
-        if (isNaN(formData.price) || formData.price <= 0) {
+        if (isNaN(formData.price) || Number(formData.price) <= 0) {
             setError('Price must be a valid positive number.');
             setSuccess('');
             return;
         }
 
         setError('');
+        setLoading(true);
 
         try {
             const response = await axios.post(
@@ -70,6 +73,8 @@ const SellPage = () => {
             console.error('Error:', error);
             setError('Failed to submit the item. Please try again.');
             setSuccess('');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -104,12 +109,13 @@ const SellPage = () => {
             ></textarea>
 
             <input
-                type="text"
+                type="number"
                 name="price"
                 value={formData.price}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
                 placeholder="Price (in Rs)"
+                min="1"
                 required
             />
 
@@ -180,8 +186,14 @@ const SellPage = () => {
                 </div>
             )}
 
-            <button className="w-full bg-blue-600 text-white font-medium px-6 py-3 mt-4 rounded-md shadow-md hover:bg-blue-700 transition-all duration-200">
-                Submit
+            <button
+                type="submit"
+                disabled={loading}
+                className={`w-full bg-blue-600 text-white font-medium px-6 py-3 mt-4 rounded-md shadow-md transition-all duration-200 ${
+                    loading ? 'opacity-60 cursor-not-allowed' : 'hover:bg-blue-700'
+                }`}
+            >
+                {loading ? 'Submitting...' : 'Submit'}
             </button>
         </form>
     );

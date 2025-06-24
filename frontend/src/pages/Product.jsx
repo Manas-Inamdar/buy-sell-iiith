@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext.jsx';
 import {jwtDecode} from 'jwt-decode';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 
 const Product = () => {
@@ -100,8 +99,6 @@ const Product = () => {
 
   return (
     <>
-      <ToastContainer />
-
       {productdata ? (
         <div className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">

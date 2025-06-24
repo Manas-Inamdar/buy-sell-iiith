@@ -34,6 +34,24 @@ const Profile = () => {
               <p className="text-gray-600">{user?.email}</p>
             </div>
           </div>
+          <div className="space-y-2">
+            <div>
+              <span className="font-semibold text-gray-700">First Name: </span>
+              <span className="text-gray-600">{user?.firstname || 'N/A'}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Last Name: </span>
+              <span className="text-gray-600">{user?.lastname || 'N/A'}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Email: </span>
+              <span className="text-gray-600">{user?.email || 'N/A'}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700">Contact Number: </span>
+              <span className="text-gray-600">{user?.contactnumber || 'N/A'}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

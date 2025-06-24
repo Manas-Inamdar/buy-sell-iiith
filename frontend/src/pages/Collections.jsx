@@ -4,31 +4,22 @@ import { ShopContext } from "../context/ShopContext";
 import { assets } from "../frontend_assets/assets";
 import Title from "../components/Title";
 import Product from "../components/Product";
+import { toast } from "react-toastify";
 
 const Collections = () => {
-  const {search, setSearch, showSearch, setShowSearch } = useContext(ShopContext);
-  const [products, setProducts] = useState([]);
+  const { search, setSearch, showSearch, setShowSearch, products, fetchProducts } = useContext(ShopContext);
   const [filter, setFilter] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/product/list');
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data); // Initialize filteredProducts with fetched data
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      }
-    };
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    setFilteredProducts(products);
+  }, [products]);
 
   const toggle = (e) => {
     if (category.includes(e.target.value)) {

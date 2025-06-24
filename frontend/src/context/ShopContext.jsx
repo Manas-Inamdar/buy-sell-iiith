@@ -1,6 +1,8 @@
 import { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 
 export const ShopContext = createContext();
@@ -55,10 +57,33 @@ const ShopContextProvider = (props) => {
         }
     }, [token,navigate]);
 
+    // Fetch products with specific error handling
+    const fetchProducts = async () => {
+        try {
+            const res = await axios.get("http://localhost:4000/api/product/list");
+            setProducts(res.data);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to fetch products");
+        }
+    };
+
+    // Fetch user info with specific error handling
+    const fetchUserInfo = async (email) => {
+        try {
+            const res = await axios.get(`http://localhost:4000/api/user/email/${email}`);
+            // Do something with res.data if needed
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to fetch user info");
+        }
+    };
+
     const value = {
         cartcount, setCartCount, cartdata, setCartData, products, setProducts,
         currency, delivery_fee, search, setSearch, showSearch, setShowSearch,
-        token, setToken, user
+        token, setToken, user,
+        fetchProducts, fetchUserInfo // <-- Export these functions
     };
 
     return (

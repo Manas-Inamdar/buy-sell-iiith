@@ -8,6 +8,7 @@ const Register = () => {
   const [lastname, setLastname] = useState('');
   const [contactnumber, setContactnumber] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,10 +17,21 @@ const Register = () => {
     }
   }, [email, navigate]);
 
+  const validateContact = (number) => {
+    // Simple validation: 10 digits, all numbers
+    return /^\d{10}$/.test(number);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    // Optionally validate contact number here
+
+    if (!validateContact(contactnumber)) {
+      setError('Please enter a valid 10-digit contact number');
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await fetch('http://localhost:4000/api/user/register-details', {
         method: 'POST',
@@ -34,63 +46,68 @@ const Register = () => {
       }
     } catch (err) {
       setError('Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(120deg, #6a11cb 0%, #2575fc 50%, #43e97b 100%)'
-    }}>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-indigo-500 to-green-400">
       <form
         onSubmit={handleSubmit}
-        style={{
-          background: 'white',
-          padding: 32,
-          borderRadius: 16,
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.25)',
-          minWidth: 320,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16
-        }}
+        className="bg-white p-8 rounded-2xl shadow-2xl min-w-[320px] w-full max-w-md flex flex-col gap-4"
       >
-        <h2 style={{ textAlign: 'center', marginBottom: 8 }}>Complete Your Registration</h2>
-        <label>
+        <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">Complete Your Registration</h2>
+        <label className="font-medium text-gray-700">
           Email:
-          <input value={email} disabled style={{ width: '100%', marginTop: 4, marginBottom: 8 }} />
+          <input
+            value={email}
+            disabled
+            className="w-full mt-1 mb-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+          />
         </label>
-        <label>
+        <label className="font-medium text-gray-700">
           First Name:
-          <input value={firstname} onChange={e => setFirstname(e.target.value)} required style={{ width: '100%', marginTop: 4 }} />
+          <input
+            value={firstname}
+            onChange={e => setFirstname(e.target.value)}
+            required
+            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter your first name"
+          />
         </label>
-        <label>
+        <label className="font-medium text-gray-700">
           Last Name:
-          <input value={lastname} onChange={e => setLastname(e.target.value)} required style={{ width: '100%', marginTop: 4 }} />
+          <input
+            value={lastname}
+            onChange={e => setLastname(e.target.value)}
+            required
+            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter your last name"
+          />
         </label>
-        <label>
+        <label className="font-medium text-gray-700">
           Contact Number:
-          <input value={contactnumber} onChange={e => setContactnumber(e.target.value)} required style={{ width: '100%', marginTop: 4 }} />
+          <input
+            value={contactnumber}
+            onChange={e => setContactnumber(e.target.value)}
+            required
+            maxLength={10}
+            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="10-digit mobile number"
+            inputMode="numeric"
+            pattern="\d*"
+          />
         </label>
-        {error && <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>}
+        {error && <div className="text-red-600 text-center">{error}</div>}
         <button
           type="submit"
-          style={{
-            marginTop: 12,
-            background: 'linear-gradient(90deg, #2563eb 0%, #6a11cb 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 8,
-            padding: '10px 0',
-            fontWeight: 'bold',
-            fontSize: 16,
-            cursor: 'pointer'
-          }}
+          disabled={loading}
+          className={`mt-2 bg-gradient-to-r from-blue-600 to-indigo-500 text-white rounded-lg py-3 font-bold text-lg shadow-md transition-all duration-200 ${
+            loading ? 'opacity-60 cursor-not-allowed' : 'hover:from-blue-700 hover:to-indigo-600'
+          }`}
         >
-          Submit
+          {loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </div>

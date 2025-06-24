@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify"; // <-- Add this import
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,10 +34,12 @@ const Login = () => {
             } else {
               navigate('/');
             }
+          } else {
+            toast.error("CAS validation failed");
           }
         })
         .catch(() => {
-          // handle error (optional)
+          toast.error("Login failed. Please try again.");
         });
     }
   }, [navigate]);
