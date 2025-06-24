@@ -1,6 +1,6 @@
 import productModel from '../models/productmodel.js';
 
-// Allowed categories and types
+// Allowed categories and types here
 const ALL_CATEGORIES = [
     "Electronics", "Furniture", "Clothing", "Books", "Appliances", "Sports", "Stationery", "Miscellaneous"
 ];
