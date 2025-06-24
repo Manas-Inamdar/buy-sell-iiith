@@ -54,30 +54,37 @@ app.post('/api/generate-text', async (req, res) => {
       return res.json({ generatedText: "Please enter a valid search or question." });
     }
     prompt = prompt.trim();
-
-    // List of common greetings/stopwords to ignore as product searches
-    const stopwords = [
-      "hi", "hello", "hey", "ok", "okay", "thanks", "thank you", "yo", "sup", "good morning", "good evening", "good night", "bye"
-    ];
     const promptLower = prompt.toLowerCase();
 
-    // Only treat as product search if it's not a stopword/greeting and not a question
-    const isProductSearch = (
+    // 1. Instant responses for greetings and common phrases
+    if (/^(hi|hello|hey|good morning|good evening|good night)[\s!,.]*$/i.test(promptLower)) {
+      return res.json({
+        generatedText: "👋 Hi there! Welcome to the IIIT community buy & sell platform. How can I help you today? You can ask about buying, selling, posting a product, or anything related to the platform."
+      });
+    }
+    if (/^(thanks|thank you|ty)[\s!,.]*$/i.test(promptLower)) {
+      return res.json({
+        generatedText: "You're welcome! 😊 If you have any more questions about buying, selling, or using the platform, just ask."
+      });
+    }
+    if (/^(bye|goodbye|see you|cya)[\s!,.]*$/i.test(promptLower)) {
+      return res.json({
+        generatedText: "Goodbye! 👋 If you need help with buying or selling in the future, just open this chat again."
+      });
+    }
+
+    // 2. Detect if the prompt is a likely product search (not a question, not a greeting, not a command)
+    const isLikelyProductSearch =
       prompt.length > 1 &&
       prompt.length < 50 &&
-      !/[?]/.test(prompt) &&
+      !/[?!.]$/.test(prompt) && // not ending with punctuation
       prompt.split(' ').length <= 5 &&
-      !stopwords.includes(promptLower)
-    );
+      !/^(who|what|when|where|why|how|is|are|do|does|can|could|would|should|tell|show|give|find|list|about|info|information|help|please)\b/i.test(promptLower);
 
-    if (isProductSearch) {
-      // Sanitize for regex
+    if (isLikelyProductSearch) {
       const searchTerm = escapeStringRegexp(promptLower);
-
-      // Match only at the start of words (case-insensitive)
+      // Match at start of words, case-insensitive
       const regex = new RegExp(`\\b${searchTerm}`, 'i');
-
-      // Search products by name or description
       const products = await productModel.find({
         $or: [
           { name: { $regex: regex } },
@@ -87,21 +94,29 @@ app.post('/api/generate-text', async (req, res) => {
 
       if (products.length > 0) {
         const productList = products.map(
-          p => `• ${p.name} (Rs. ${p.price})`
+          p => `• <b>${p.name}</b> (Rs. ${p.price})`
         ).join('<br/>');
         return res.json({
-          generatedText: `Here are some products matching "<b>${prompt}</b>":<br/>${productList}`
+          generatedText: `Here are some products matching "<b>${prompt}</b>":<br/>${productList}<br/><br/>Want to know more about a product or how to buy/sell? Just ask!`
         });
       } else {
-        // If no product found, respond rationally and redirect to buy/sell chat
+        // No product found, offer help
         return res.json({
-          generatedText: `Sorry, no products matching "<b>${prompt}</b>" were found.<br/><br/>If you need help with buying or selling, feel free to ask me about how to post a product, search for items, or manage your orders!`
+          generatedText: `Sorry, no products matching "<b>${prompt}</b>" were found.<br/><br/>You can try searching with a different name, or ask me how to post a product, search for items, or manage your orders!`
         });
       }
     }
 
-    // Otherwise, use Gemini as usual
-    const instruction = "You are an assistant for an IIIT community buy & sell platform. Only answer questions related to buying, selling, products, orders, and platform usage. If asked anything else, politely refuse and redirect to platform topics.";
+    // 3. If the prompt is a question or random text, use Gemini with a strong instruction
+    const instruction = `
+You are an assistant for the IIIT community buy & sell platform.
+- If the user asks about buying, selling, posting products, searching, orders, or platform usage, answer helpfully and concisely.
+- If the user types random text, nonsense, or off-topic questions, politely redirect them to platform-related topics and suggest what they can ask.
+- If the user greets, respond warmly and offer help with platform features.
+- Never answer questions unrelated to the platform (like general knowledge, jokes, etc).
+- If the user seems lost, suggest they can ask about buying, selling, posting, searching, or managing orders.
+`;
+
     const fullPrompt = instruction + "\nUser: " + prompt;
 
     const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
@@ -109,7 +124,7 @@ app.post('/api/generate-text', async (req, res) => {
     const response = await result.response;
     const text = response.text();
 
-    res.json({ generatedText: text || "Sorry, I couldn't generate a response." });
+    res.json({ generatedText: text || "Sorry, I couldn't generate a response. Please ask about buying, selling, or using the platform." });
   } catch (error) {
     console.error('Error in /generate-text:', error);
     res.status(500).json({ error: error.message });
