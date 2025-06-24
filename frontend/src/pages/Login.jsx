@@ -1,19 +1,21 @@
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from "react-toastify"; // <-- Add this import
+import { toast } from "react-toastify";
+import { ShopContext } from '../context/ShopContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setToken } = useContext(ShopContext);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
-      localStorage.setItem('token', token);
+      setToken(token); // Use context to set token
       navigate('/');
     }
-  }, [navigate]);
+  }, [navigate, setToken]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -27,7 +29,7 @@ const Login = () => {
         })
         .then((res) => {
           if (res.data.success) {
-            localStorage.setItem('token', res.data.token);
+            setToken(res.data.token); // Use context to set token
             if (res.data.isNewUser) {
               // Redirect to Register page with email in query
               navigate(`/register?email=${res.data.user.email}`);
@@ -42,7 +44,7 @@ const Login = () => {
           toast.error("Login failed. Please try again.");
         });
     }
-  }, [navigate]);
+  }, [navigate, setToken]);
 
   const handleCASLogin = () => {
     const service = encodeURIComponent('http://localhost:5173/login');

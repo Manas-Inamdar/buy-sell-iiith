@@ -6,20 +6,75 @@ import Title from "../components/Title";
 import Product from "../components/Product";
 import { toast } from "react-toastify";
 
+const ALL_CATEGORIES = [
+  "Electronics",
+  "Furniture",
+  "Clothing",
+  "Books",
+  "Appliances",
+  "Sports",
+  "Stationery",
+  "Miscellaneous"
+];
+
+const ALL_TYPES = [
+  // Electronics
+  "Mobile Phones", "Laptops", "Cameras", "Tablets", "Headphones", "Smart Watches", "Speakers", "Accessories",
+  // Furniture
+  "Beds", "Sofas", "Chairs", "Tables", "Desks", "Wardrobes", "Shelves", "Drawers",
+  // Clothing
+  "Men", "Women", "Kids", "T-Shirts", "Jeans", "Jackets", "Shoes",
+  // Books
+  "Textbooks", "Novels", "Reference", "Comics", "Magazines", "Entrance Prep",
+  // Appliances
+  "Kitchen Appliances", "Washing Machines", "Refrigerators", "Microwaves", "Fans", "Heaters",
+  // Sports
+  "Cricket", "Football", "Badminton", "Gym Equipment", "Bicycles",
+  // Stationery
+  "Notebooks", "Pens & Pencils", "Calculators", "Drawing Supplies", "Folders",
+  // Miscellaneous
+  "Bags", "Watches", "Musical Instruments", "Games", "Others"
+];
+
 const Collections = () => {
   const { search, setSearch, showSearch, setShowSearch, products, fetchProducts } = useContext(ShopContext);
   const [filter, setFilter] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
+  const [sortOption, setSortOption] = useState('relevant'); // NEW
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Apply filters and sorting together
   useEffect(() => {
-    setFilteredProducts(products);
-  }, [products]);
+    let copy = products.slice();
+
+    if (category.length > 0) {
+      copy = copy.filter((item) => category.includes(item.category));
+    }
+
+    if (subCategory.length > 0) {
+      copy = copy.filter((item) => subCategory.includes(item.subCategory));
+    }
+
+    if (search) {
+      copy = copy.filter((item) =>
+        (item.name || item.title || '').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    // Sort after filtering
+    if (sortOption === 'low-high') {
+      copy.sort((a, b) => a.price - b.price);
+    } else if (sortOption === 'high-low') {
+      copy.sort((a, b) => b.price - a.price);
+    }
+
+    setFilteredProducts(copy);
+  }, [category, subCategory, search, products, sortOption]);
 
   const toggle = (e) => {
     if (category.includes(e.target.value)) {
@@ -37,37 +92,10 @@ const Collections = () => {
     }
   };
 
-  const apply = () => {
-    let copy = products.slice();
-
-    if (category.length > 0) {
-      copy = copy.filter((item) => category.includes(item.category));
-    }
-
-    if (subCategory.length > 0) {
-      copy = copy.filter((item) => subCategory.includes(item.subCategory));
-    }
-
-    if (search) {
-      copy = copy.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()));
-    }
-
-    setFilteredProducts(copy);
-  };
-
+  // Just update the sort option
   const sort = (variable) => {
-    let copy = products.slice();
-    if (variable === 'low-high') {
-      copy.sort((a, b) => a.price - b.price);
-    } else if (variable === 'high-low') {
-      copy.sort((a, b) => b.price - a.price);
-    }
-    setFilteredProducts(copy);
+    setSortOption(variable);
   };
-
-  useEffect(() => {
-    apply();
-  }, [category, subCategory, search, products]);
 
   return (
     <>
@@ -107,7 +135,7 @@ const Collections = () => {
           <div className={`border border-gray-300 pl-5 py-3 mt-6 ${filter ? "" : "hidden"} sm:block`}>
             <p className="mb-3 text-sm font-medium">CATEGORIES</p>
             <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-              {["Electronics", "Furniture", "Clothing"].map((cat) => (
+              {ALL_CATEGORIES.map((cat) => (
                 <p className="flex gap-2" key={cat}>
                   <input className="w-3" type="checkbox" value={cat} onChange={toggle} />
                   {cat.toUpperCase()}
@@ -118,8 +146,8 @@ const Collections = () => {
 
           <div className={`border border-gray-300 pl-5 py-3 my-5 ${filter ? "" : "hidden"} sm:block`}>
             <p className="mb-3 text-sm font-medium">TYPE</p>
-            <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-              {["Mobile Phones", "Laptops", "Cameras","Beds","Sofas","Chairs","Men","Women","Kids "].map((subCat) => (
+            <div className="flex flex-col gap-2 text-sm font-light text-gray-700" style={{ maxHeight: 220, overflowY: "auto" }}>
+              {ALL_TYPES.map((subCat) => (
                 <p className="flex gap-2" key={subCat}>
                   <input className="w-3" type="checkbox" value={subCat} onChange={toggle1} />
                   {subCat}

@@ -83,16 +83,24 @@ const GeminiChatbot = () => {
           
           <div className="flex-grow overflow-y-auto p-3 space-y-2">
             {messages.map((msg, index) => (
-              <div 
-                key={index} 
-                className={`p-2 rounded-lg max-w-[80%] ${
-                  msg.sender === 'user' 
-                    ? 'bg-blue-100 self-end ml-auto' 
-                    : 'bg-gray-100 self-start'
-                }`}
-              >
-                {msg.text}
-              </div>
+              msg.sender === 'ai' && msg.text ? (
+                <div
+                  key={index}
+                  className="p-2 rounded-lg max-w-[80%] bg-gray-100 self-start"
+                  dangerouslySetInnerHTML={{ __html: msg.text }}
+                />
+              ) : (
+                <div
+                  key={index}
+                  className={`p-2 rounded-lg max-w-[80%] ${
+                    msg.sender === 'user'
+                      ? 'bg-blue-100 self-end ml-auto'
+                      : 'bg-gray-100 self-start'
+                  }`}
+                >
+                  {msg.text || <span>Sorry, something went wrong.</span>}
+                </div>
+              )
             ))}
             {isLoading && (
               <div className="p-2 bg-gray-100 rounded-lg self-start">

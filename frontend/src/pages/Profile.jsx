@@ -13,6 +13,13 @@ const Profile = () => {
   }, [token, navigate]);
 
   if (!token) return null;
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">

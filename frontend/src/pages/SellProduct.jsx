@@ -17,9 +17,30 @@ const SellPage = () => {
     const [loading, setLoading] = useState(false);
 
     const categories = {
-        Electronics: ['Mobile Phones', 'Laptops', 'Cameras'],
-        Furniture: ['Beds', 'Sofas', 'Chairs'],
-        Clothing: ['Men', 'Women', 'Kids'],
+        Electronics: [
+            'Mobile Phones', 'Laptops', 'Cameras', 'Tablets', 'Headphones', 'Smart Watches', 'Speakers', 'Accessories'
+        ],
+        Furniture: [
+            'Beds', 'Sofas', 'Chairs', 'Tables', 'Desks', 'Wardrobes', 'Shelves', 'Drawers'
+        ],
+        Clothing: [
+            'Men', 'Women', 'Kids', 'T-Shirts', 'Jeans', 'Jackets', 'Shoes', 'Accessories'
+        ],
+        Books: [
+            'Textbooks', 'Novels', 'Reference', 'Comics', 'Magazines', 'Entrance Prep'
+        ],
+        Appliances: [
+            'Kitchen Appliances', 'Washing Machines', 'Refrigerators', 'Microwaves', 'Fans', 'Heaters'
+        ],
+        Sports: [
+            'Cricket', 'Football', 'Badminton', 'Gym Equipment', 'Bicycles', 'Accessories'
+        ],
+        Stationery: [
+            'Notebooks', 'Pens & Pencils', 'Calculators', 'Drawing Supplies', 'Folders'
+        ],
+        Miscellaneous: [
+            'Bags', 'Watches', 'Musical Instruments', 'Games', 'Others'
+        ]
     };
 
     const handleChange = (e) => {

@@ -1,9 +1,7 @@
-import { createContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { createContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from "react-toastify";
-
+import { useNavigate } from "react-router-dom";
 
 export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
@@ -17,47 +15,36 @@ const ShopContextProvider = (props) => {
     const [search, setSearch] = useState("");
     const [showSearch, setShowSearch] = useState(false);
 
-    const [user, setUser] = useState(null);
     const [token, setTokenState] = useState(localStorage.getItem('token') || '');
+    const [user, setUser] = useState(null);
 
     const setToken = (newToken) => {
         setTokenState(newToken);
         if (newToken) localStorage.setItem('token', newToken);
-        else localStorage.removeItem('token');
+        else {
+            localStorage.removeItem('token');
+            setUser(null);
+        }
     };
 
     useEffect(() => {
-        if (token) {
-            try {
-                const decodedToken = jwtDecode(token);
-                const currentTime = Date.now() / 1000; // Current time in seconds
-
-                if (decodedToken.exp < currentTime) {
-                    // Token is expired
-                    console.error("Token expired");
-                    setToken(null);
+        const fetchUser = async () => {
+            if (token) {
+                try {
+                    const res = await axios.get('http://localhost:4000/api/user/profile', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setUser(res.data);
+                } catch (err) {
                     setUser(null);
-                    localStorage.removeItem("token");
-                    navigate('/login');
-                } else {
-                    const newUser = { id: decodedToken.id, email: decodedToken.email };
-                    setUser(newUser);
-                    console.log(newUser, "user");
-                    // Adjust based on your token payload
                 }
-            } catch (error) {
-                console.error("Invalid token:", error);
-                setToken(null);
+            } else {
                 setUser(null);
-                localStorage.removeItem("token"); // Clear invalid tokens
-                navigate('/login');
             }
-        } else {
-            setUser(null); // Reset user if no token
-        }
-    }, [token,navigate]);
+        };
+        fetchUser();
+    }, [token]);
 
-    // Fetch products with specific error handling
     const fetchProducts = async () => {
         try {
             const res = await axios.get("http://localhost:4000/api/product/list");
@@ -68,7 +55,6 @@ const ShopContextProvider = (props) => {
         }
     };
 
-    // Fetch user info with specific error handling
     const fetchUserInfo = async (email) => {
         try {
             const res = await axios.get(`http://localhost:4000/api/user/email/${email}`);
@@ -82,8 +68,8 @@ const ShopContextProvider = (props) => {
     const value = {
         cartcount, setCartCount, cartdata, setCartData, products, setProducts,
         currency, delivery_fee, search, setSearch, showSearch, setShowSearch,
-        token, setToken, user,
-        fetchProducts, fetchUserInfo // <-- Export these functions
+        token, setToken, user, setUser,
+        fetchProducts, fetchUserInfo
     };
 
     return (

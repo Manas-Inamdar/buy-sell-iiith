@@ -11,6 +11,9 @@ import axios from 'axios';
 import uploadRouter from './routes/uploadrouter.js';
 import paymentRouter from './routes/paymentrouter.js';
 import session from 'express-session';
+import productModel from './models/productmodel.js'; // Make sure this import is present
+import escapeStringRegexp from 'escape-string-regexp'; // Add this at the top (npm i escape-string-regexp)
+// Optionally, for fuzzy search: import Fuse from 'fuse.js'; (npm i fuse.js)
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -44,16 +47,69 @@ app.use('/api/payment', paymentRouter);
 
 // Gemini Text Generation
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY);
-app.post('/generate-text', async (req, res) => {
+app.post('/api/generate-text', async (req, res) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const { prompt } = req.body;
+    let { prompt } = req.body;
+    if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+      return res.json({ generatedText: "Please enter a valid search or question." });
+    }
+    prompt = prompt.trim();
 
-    const result = await model.generateContent(prompt);
+    // List of common greetings/stopwords to ignore as product searches
+    const stopwords = [
+      "hi", "hello", "hey", "ok", "okay", "thanks", "thank you", "yo", "sup", "good morning", "good evening", "good night", "bye"
+    ];
+    const promptLower = prompt.toLowerCase();
+
+    // Only treat as product search if it's not a stopword/greeting and not a question
+    const isProductSearch = (
+      prompt.length > 1 &&
+      prompt.length < 50 &&
+      !/[?]/.test(prompt) &&
+      prompt.split(' ').length <= 5 &&
+      !stopwords.includes(promptLower)
+    );
+
+    if (isProductSearch) {
+      // Sanitize for regex
+      const searchTerm = escapeStringRegexp(promptLower);
+
+      // Match only at the start of words (case-insensitive)
+      const regex = new RegExp(`\\b${searchTerm}`, 'i');
+
+      // Search products by name or description
+      const products = await productModel.find({
+        $or: [
+          { name: { $regex: regex } },
+          { description: { $regex: regex } }
+        ]
+      }).limit(5);
+
+      if (products.length > 0) {
+        const productList = products.map(
+          p => `• ${p.name} (Rs. ${p.price})`
+        ).join('<br/>');
+        return res.json({
+          generatedText: `Here are some products matching "<b>${prompt}</b>":<br/>${productList}`
+        });
+      } else {
+        // If no product found, respond rationally and redirect to buy/sell chat
+        return res.json({
+          generatedText: `Sorry, no products matching "<b>${prompt}</b>" were found.<br/><br/>If you need help with buying or selling, feel free to ask me about how to post a product, search for items, or manage your orders!`
+        });
+      }
+    }
+
+    // Otherwise, use Gemini as usual
+    const instruction = "You are an assistant for an IIIT community buy & sell platform. Only answer questions related to buying, selling, products, orders, and platform usage. If asked anything else, politely refuse and redirect to platform topics.";
+    const fullPrompt = instruction + "\nUser: " + prompt;
+
+    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+    const result = await model.generateContent(fullPrompt);
     const response = await result.response;
     const text = response.text();
 
-    res.json({ generatedText: text });
+    res.json({ generatedText: text || "Sorry, I couldn't generate a response." });
   } catch (error) {
     console.error('Error in /generate-text:', error);
     res.status(500).json({ error: error.message });
