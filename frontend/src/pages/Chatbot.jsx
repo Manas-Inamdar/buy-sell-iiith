@@ -26,13 +26,19 @@ const GeminiChatbot = () => {
 
     try {
       const token = localStorage.getItem('token');
+      // Build history for backend
+      const historyForBackend = newMessages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
       const response = await fetch('/api/generate-text', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify({ prompt: input })
+        body: JSON.stringify({ prompt: input, history: historyForBackend })
       });
 
       if (!response.ok) {

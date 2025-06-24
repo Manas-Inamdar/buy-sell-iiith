@@ -13,7 +13,8 @@ import paymentRouter from './routes/paymentrouter.js';
 import session from 'express-session';
 import productModel from './models/productmodel.js'; // Make sure this import is present
 import escapeStringRegexp from 'escape-string-regexp'; // Add this at the top (npm i escape-string-regexp)
-// Optionally, for fuzzy search: import Fuse from 'fuse.js'; (npm i fuse.js)
+import pluralize from 'pluralize'; // npm install pluralize
+import Fuse from 'fuse.js'; // <-- Add this at the top with your other imports
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -49,10 +50,9 @@ app.use('/api/payment', paymentRouter);
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY);
 app.post('/api/generate-text', async (req, res) => {
   try {
-    let { prompt } = req.body;
-    if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-      return res.json({ generatedText: "Please enter a valid search or question." });
-    }
+    // Accept history (array) or prompt (string)
+    const history = req.body.history || [];
+    let prompt = req.body.prompt || '';
     prompt = prompt.trim();
     const promptLower = prompt.toLowerCase();
 
@@ -73,24 +73,72 @@ app.post('/api/generate-text', async (req, res) => {
       });
     }
 
-    // 2. Detect if the prompt is a likely product search (not a question, not a greeting, not a command)
+    const platformHelp = {
+      buy: `To <b>buy</b> products, search for the item and click "Buy" on the product page.`,
+      sell: `To <b>sell</b> a product, go to "Post Product" and fill in the details.`,
+      post: `To <b>post</b> a product, go to "Post Product" and fill in the details.`,
+      orders: `To view or manage your <b>orders</b>, go to "My Orders" in your profile.`,
+      "my orders": `To view or manage your <b>orders</b>, go to "My Orders" in your profile.`,
+      profile: `To view or edit your <b>profile</b>, click the user icon at the top right.`,
+      cart: `To view your <b>cart</b>, use the cart icon at the top.`,
+      wishlist: `To view your <b>wishlist</b>, use the wishlist icon at the top.`,
+      account: `To manage your <b>account</b>, go to your profile settings.`,
+      settings: `To change <b>settings</b>, go to your profile and select "Settings".`,
+      logout: `To <b>logout</b>, click the user icon and select "Logout".`,
+      login: `To <b>login</b>, click the user icon and sign in with your IIIT credentials.`,
+      "sign in": `To <b>sign in</b>, click the user icon and enter your IIIT credentials.`,
+      "sign out": `To <b>sign out</b>, click the user icon and select "Logout".`,
+      help: `You can ask me about buying, selling, posting products, searching, orders, or platform usage!`,
+      support: `For support, contact the platform admin or ask your question here.`,
+    };
+
+    const matchedKey = Object.keys(platformHelp).find(
+      key => key === promptLower
+    );
+
+    if (matchedKey) {
+      return res.json({
+        generatedText: platformHelp[matchedKey]
+      });
+    }
+
+    // Avoid product search for follow-ups like "yes", "ok", etc.
+    const followUps = ['yes', 'ok', 'okay', 'sure', 'tell me more', 'more', 'go on', 'continue'];
+    const wordCount = prompt.split(/\s+/).length;
     const isLikelyProductSearch =
+      wordCount <= 2 &&
       prompt.length > 1 &&
       prompt.length < 50 &&
-      !/[?!.]$/.test(prompt) && // not ending with punctuation
-      prompt.split(' ').length <= 5 &&
-      !/^(who|what|when|where|why|how|is|are|do|does|can|could|would|should|tell|show|give|find|list|about|info|information|help|please)\b/i.test(promptLower);
+      /^[a-zA-Z0-9\s\-']+$/.test(prompt) &&
+      !/[?!.]$/.test(prompt) &&
+      !followUps.includes(promptLower) &&
+      !Object.keys(platformHelp).includes(promptLower);
 
     if (isLikelyProductSearch) {
-      const searchTerm = escapeStringRegexp(promptLower);
-      // Match at start of words, case-insensitive
-      const regex = new RegExp(`\\b${searchTerm}`, 'i');
-      const products = await productModel.find({
+      const searchTerms = [
+        promptLower,
+        pluralize.singular(promptLower),
+        pluralize.plural(promptLower)
+      ];
+      const regexes = searchTerms.map(term => new RegExp(`\\b${escapeStringRegexp(term)}`, 'i'));
+
+      let products = await productModel.find({
         $or: [
-          { name: { $regex: regex } },
-          { description: { $regex: regex } }
+          ...regexes.map(regex => ({ name: { $regex: regex } })),
+          ...regexes.map(regex => ({ description: { $regex: regex } }))
         ]
       }).limit(5);
+
+      // Fuzzy search fallback if no products found
+      if (products.length === 0) {
+        const allProducts = await productModel.find({}, 'name description price');
+        const fuse = new Fuse(allProducts, {
+          keys: ['name', 'description'],
+          threshold: 0.4, // Lower = stricter, higher = fuzzier
+        });
+        const fuzzyResults = fuse.search(promptLower).slice(0, 5).map(r => r.item);
+        products = fuzzyResults;
+      }
 
       if (products.length > 0) {
         const productList = products.map(
@@ -100,15 +148,14 @@ app.post('/api/generate-text', async (req, res) => {
           generatedText: `Here are some products matching "<b>${prompt}</b>":<br/>${productList}<br/><br/>Want to know more about a product or how to buy/sell? Just ask!`
         });
       } else {
-        // No product found, offer help
         return res.json({
           generatedText: `Sorry, no products matching "<b>${prompt}</b>" were found.<br/><br/>You can try searching with a different name, or ask me how to post a product, search for items, or manage your orders!`
         });
       }
     }
 
-    // 3. If the prompt is a question or random text, use Gemini with a strong instruction
-    const instruction = `
+    // Use conversation history for Gemini
+    let geminiPrompt = `
 You are an assistant for the IIIT community buy & sell platform.
 - If the user asks about buying, selling, posting products, searching, orders, or platform usage, answer helpfully and concisely.
 - If the user types random text, nonsense, or off-topic questions, politely redirect them to platform-related topics and suggest what they can ask.
@@ -117,10 +164,18 @@ You are an assistant for the IIIT community buy & sell platform.
 - If the user seems lost, suggest they can ask about buying, selling, posting, searching, or managing orders.
 `;
 
-    const fullPrompt = instruction + "\nUser: " + prompt;
+    if (history && Array.isArray(history) && history.length > 0) {
+      geminiPrompt += '\n\nConversation so far:\n';
+      history.forEach(msg => {
+        geminiPrompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n`;
+      });
+      geminiPrompt += `User: ${prompt}\n`;
+    } else {
+      geminiPrompt += `\nUser: ${prompt}\n`;
+    }
 
     const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
-    const result = await model.generateContent(fullPrompt);
+    const result = await model.generateContent(geminiPrompt);
     const response = await result.response;
     const text = response.text();
 
