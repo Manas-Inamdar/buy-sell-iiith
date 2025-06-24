@@ -4,7 +4,7 @@ import { assets } from '../frontend_assets/assets';
 
 const Home = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
@@ -30,9 +30,9 @@ const Home = () => {
       </div>
 
       {/* Categories Section */}
-      <div className="py-16 bg-gray-50">
+      <div className="py-16 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-12">
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-12">
             Popular Categories
           </h2>
           <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-4">
@@ -43,9 +43,9 @@ const Home = () => {
               { title: 'Notes & Resources', icon: '📝' },
             ].map((category) => (
               <div key={category.title} className="group relative">
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
                   <div className="text-4xl mb-4">{category.icon}</div>
-                  <h3 className="text-lg font-medium text-gray-900">{category.title}</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">{category.title}</h3>
                 </div>
               </div>
             ))}
@@ -54,10 +54,10 @@ const Home = () => {
       </div>
 
       {/* Features Section */}
-      <div className="py-16">
+      <div className="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">
               Why Choose Our Platform?
             </h2>
           </div>
@@ -82,8 +82,8 @@ const Home = () => {
               ].map((feature) => (
                 <div key={feature.title} className="relative">
                   <div className="text-3xl mb-4">{feature.icon}</div>
-                  <h3 className="text-lg font-medium text-gray-900">{feature.title}</h3>
-                  <p className="mt-2 text-base text-gray-500">{feature.description}</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">{feature.title}</h3>
+                  <p className="mt-2 text-base text-gray-500 dark:text-gray-300">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -92,7 +92,7 @@ const Home = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
+      <footer className="bg-gray-900 dark:bg-black text-gray-300 pt-16 pb-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>

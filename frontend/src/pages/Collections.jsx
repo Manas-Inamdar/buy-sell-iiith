@@ -118,11 +118,11 @@ const Collections = () => {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
+      <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t border-gray-200 dark:border-gray-700">
         <div className="min-w-60">
           <p
             onClick={() => setFilter(!filter)}
-            className="my-2 text-xl flex items-center cursor-pointer gap-2"
+            className="my-2 text-xl flex items-center cursor-pointer gap-2 text-gray-900 dark:text-white"
           >
             FILTERS
             <img
@@ -132,24 +132,24 @@ const Collections = () => {
             />
           </p>
 
-          <div className={`border border-gray-300 pl-5 py-3 mt-6 ${filter ? "" : "hidden"} sm:block`}>
-            <p className="mb-3 text-sm font-medium">CATEGORIES</p>
-            <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
+          <div className={`border border-gray-300 dark:border-gray-700 pl-5 py-3 mt-6 bg-white dark:bg-gray-800 rounded-lg ${filter ? "" : "hidden"} sm:block`}>
+            <p className="mb-3 text-sm font-medium text-gray-900 dark:text-gray-100">CATEGORIES</p>
+            <div className="flex flex-col gap-2 text-sm font-light text-gray-700 dark:text-gray-300">
               {ALL_CATEGORIES.map((cat) => (
                 <p className="flex gap-2" key={cat}>
-                  <input className="w-3" type="checkbox" value={cat} onChange={toggle} />
+                  <input className="w-3 accent-blue-600" type="checkbox" value={cat} onChange={toggle} />
                   {cat.toUpperCase()}
                 </p>
               ))}
             </div>
           </div>
 
-          <div className={`border border-gray-300 pl-5 py-3 my-5 ${filter ? "" : "hidden"} sm:block`}>
-            <p className="mb-3 text-sm font-medium">TYPE</p>
-            <div className="flex flex-col gap-2 text-sm font-light text-gray-700" style={{ maxHeight: 220, overflowY: "auto" }}>
+          <div className={`border border-gray-300 dark:border-gray-700 pl-5 py-3 my-5 bg-white dark:bg-gray-800 rounded-lg ${filter ? "" : "hidden"} sm:block`}>
+            <p className="mb-3 text-sm font-medium text-gray-900 dark:text-gray-100">TYPE</p>
+            <div className="flex flex-col gap-2 text-sm font-light text-gray-700 dark:text-gray-300" style={{ maxHeight: 220, overflowY: "auto" }}>
               {ALL_TYPES.map((subCat) => (
                 <p className="flex gap-2" key={subCat}>
-                  <input className="w-3" type="checkbox" value={subCat} onChange={toggle1} />
+                  <input className="w-3 accent-blue-600" type="checkbox" value={subCat} onChange={toggle1} />
                   {subCat}
                 </p>
               ))}
@@ -163,7 +163,7 @@ const Collections = () => {
             <div className="flex items-center gap-4">
               <select
                 onChange={(e) => sort(e.target.value)}
-                className="border-2 border-gray-300 px-2 py-1 text-sm"
+                className="border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100"
               >
                 <option value="relevant">Sort by: Relevant</option>
                 <option value="low-high">Sort by: Low to High</option>

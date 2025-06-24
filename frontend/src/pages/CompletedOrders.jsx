@@ -31,18 +31,18 @@ const CompletedOrders = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Completed Orders</h1>
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Completed Orders</h1>
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>
       ) : orders.length === 0 ? (
-        <p className="text-gray-600 text-center">No completed orders to display</p>
+        <p className="text-gray-600 dark:text-gray-300 text-center">No completed orders to display</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map((order) => (
-            <div key={order._id} className="bg-white shadow-lg rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Order ID: {order._id}</h2>
-              <p className="text-gray-600 mb-2">Buyer: {order.buyer}</p>
-              <p className="text-gray-600 mb-4">Seller: {order.seller}</p>
+            <div key={order._id} className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Order ID: {order._id}</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-2">Buyer: {order.buyer}</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">Seller: {order.seller}</p>
               <div className="space-y-4">
                 {order.items.map((item, index) => (
                   <div key={index} className="flex items-center gap-4">
@@ -52,14 +52,14 @@ const CompletedOrders = () => {
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                     <div>
-                      <p className="text-lg font-semibold text-gray-800">{item.product.name}</p>
-                      <p className="text-gray-600">Quantity: {item.quantity}</p>
-                      <p className="text-gray-600">Price: ₹{item.product.price}</p>
+                      <p className="text-lg font-semibold text-gray-800 dark:text-white">{item.product.name}</p>
+                      <p className="text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
+                      <p className="text-gray-600 dark:text-gray-300">Price: ₹{item.product.price}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <p className={`mt-4 ${order.status === 'Pending' ? 'text-yellow-600 font-bold' : 'text-gray-600'}`}>Status: {order.status}</p>
+              <p className={`mt-4 ${order.status === 'Pending' ? 'text-yellow-600 font-bold' : 'text-gray-600 dark:text-gray-300'}`}>Status: {order.status}</p>
             </div>
           ))}
         </div>

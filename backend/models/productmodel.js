@@ -33,12 +33,11 @@ const productSchema = new mongoose.Schema({
         type: Number,
         // required: true
     },
-    buyer_email:
-    {
+    buyer_email: {
         type: String,
         required: true
     }
-
+    // rating and reviewsCount removed
 }, { minimize: false });
 
 const productModel = mongoose.models.Product || mongoose.model('Product', productSchema);

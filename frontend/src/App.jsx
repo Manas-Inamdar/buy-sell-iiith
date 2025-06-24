@@ -22,7 +22,7 @@ const App = () => {
   const hideNavbar = location.pathname === "/login";
 
   return (
-    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
+    <div className="min-h-screen px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       <ToastContainer />
       <GeminiChatbot />
       {!hideNavbar && <Navbar />}

@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
     const { cartcount, setCartCount, showSearch, setShowSearch, user, setToken, cartdata } = useContext(ShopContext);
@@ -53,40 +54,42 @@ const Navbar = () => {
           >
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
           </svg>
-          <span className="text-xl font-bold text-gray-800">
+          <span className="text-xl font-bold text-gray-800 dark:text-gray-100">
             IIIT<span className="text-blue-600">Market</span>
           </span>
         </div>
       );
 
     return (
-        <div className="flex items-center justify-between py-10 font-extrabold">
+        <div className="flex items-center justify-between py-10 font-extrabold bg-white dark:bg-gray-900">
             <Link to="/">
                 <Logo />
             </Link>
-            <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
+            <ul className="hidden sm:flex gap-5 text-sm text-gray-700 dark:text-gray-200">
                 <NavLink to="/" className="flex flex-col items-center gap-1">
                     <p>HOME</p>
-                    <hr className="w-2/4 border-none h-[1.5px] bg-gray-700" />
+                    <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 dark:bg-gray-200" />
                 </NavLink>
                 <NavLink to="/collection" className="flex flex-col items-center gap-1">
                     <p>COLLECTION</p>
-                    <hr className="w-2/4 border-none h-[1.5px] bg-gray-700" />
+                    <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 dark:bg-gray-200" />
                 </NavLink>
                 {user && (
                     <>
                         <NavLink to="/sell" className="flex flex-col items-center gap-1">
                             <p>SELL</p>
-                            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700" />
+                            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 dark:bg-gray-200" />
                         </NavLink>
                         <NavLink to="/sold" className="flex flex-col items-center gap-1">
                             <p>ITEMS SOLD</p>
-                            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700" />
+                            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 dark:bg-gray-200" />
                         </NavLink>
                     </>
                 )}
             </ul>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
+                {/* Theme toggle button on the left of search */}
+                <ThemeToggle />
                 {user ? (
                     <img
                         onClick={() => setShowSearch(!showSearch)}

@@ -159,10 +159,10 @@ const Cart = () => {
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6">
         <div className="text-center max-w-md">
           {/* <EmptyCartIcon /> */}
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
             Your Shopping Cart is Empty
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
             Looks like you haven't made your choice yet. Browse the collection and add something you like!
           </p>
           <Link 
@@ -178,9 +178,9 @@ const Cart = () => {
 
   return (
     <div className="p-6">
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-lg p-6">
         {/* Title */}
-        <div className="border-b pb-4 mb-6">
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
           <Title text1="Your" text2="Cart" />
         </div>
 
@@ -194,7 +194,7 @@ const Cart = () => {
             return (
               <div
                 key={index}
-                className="flex flex-col md:flex-row items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm"
+                className="flex flex-col md:flex-row items-center justify-between bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm"
               >
                 {/* Product*/}
                 <div className="flex items-center gap-4">
@@ -204,18 +204,18 @@ const Cart = () => {
                     alt={product.name}
                   />
                   <div>
-                    <p className="text-lg font-semibold text-gray-800">{product.name}</p>
-                    <p className="text-sm text-gray-500">{currency}{product.price}</p>
+                    <p className="text-lg font-semibold text-gray-800 dark:text-white">{product.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">{currency}{product.price}</p>
                   </div>
                 </div>
 
                 {/* Quantity*/}
                 <div className="flex items-center mt-4 md:mt-0">
-                  <label className="text-sm text-gray-600 mr-2">Qty:</label>
-                  <div className="flex items-center border border-gray-300 rounded-md">
+                  <label className="text-sm text-gray-600 dark:text-gray-300 mr-2">Qty:</label>
+                  <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded-md">
                     <button
                       onClick={() => handleDecrementQuantity(product)}
-                      className="w-8 h-8 flex justify-center items-center text-lg text-gray-700 bg-gray-200 rounded-l-md hover:bg-gray-300"
+                      className="w-8 h-8 flex justify-center items-center text-lg text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-l-md hover:bg-gray-300 dark:hover:bg-gray-600"
                     >
                       -
                     </button>
@@ -224,7 +224,7 @@ const Cart = () => {
                       min={1}
                       value={quantity}
                       readOnly
-                      className="w-12 h-8 text-center border-0 outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-12 h-8 text-center border-0 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       style={{
                         WebkitAppearance: 'none', 
                         MozAppearance: 'textfield', 
@@ -232,7 +232,7 @@ const Cart = () => {
                     />
                     <button
                       onClick={() => handleIncrementQuantity(product)}
-                      className="w-8 h-8 flex justify-center items-center text-lg text-gray-700 bg-gray-200 rounded-r-md hover:bg-gray-300"
+                      className="w-8 h-8 flex justify-center items-center text-lg text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-r-md hover:bg-gray-300 dark:hover:bg-gray-600"
                     >
                       +
                     </button>
@@ -241,7 +241,7 @@ const Cart = () => {
 
                 {/* Remove Button */}
                 <div
-                  className="text-red-600 cursor-pointer hover:text-red-800 transition duration-200 mt-4 md:mt-0"
+                  className="text-red-600 cursor-pointer hover:text-red-800 dark:hover:text-red-400 transition duration-200 mt-4 md:mt-0"
                   onClick={() => handleRemoveItem(product._id)}
                 >
                   <img
@@ -257,7 +257,7 @@ const Cart = () => {
 
         {/* Total*/}
         <div className="mt-10 text-right space-y-4">
-          <p className="text-2xl font-bold text-gray-800">
+          <p className="text-2xl font-bold text-gray-800 dark:text-white">
             Total: {currency}{total.toFixed(2)}
           </p>
           <button

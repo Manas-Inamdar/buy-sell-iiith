@@ -31,8 +31,8 @@ const CompletedSold = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 rounded-lg">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 dark:bg-gray-900 rounded-lg">
+        <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">
           Loading...
         </h3>
       </div>
@@ -41,11 +41,11 @@ const CompletedSold = () => {
 
   if (orders.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 rounded-lg">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 dark:bg-gray-900 rounded-lg">
+        <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">
           No Completed Sales Found
         </h3>
-        <p className="text-gray-500 text-center max-w-sm">
+        <p className="text-gray-500 dark:text-gray-300 text-center max-w-sm">
           Your completed sales will appear here
         </p>
       </div>
@@ -55,9 +55,9 @@ const CompletedSold = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {orders.map((order) => (
-        <div key={order._id} className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Order ID: {order._id}</h2>
-          <p className="text-gray-600 mb-2">Buyer: {order.buyer}</p>
+        <div key={order._id} className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Order ID: {order._id}</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-2">Buyer: {order.buyer}</p>
           <div className="space-y-4">
             {order.items.map((item, index) => (
               <div key={index} className="flex items-center gap-4">
@@ -67,9 +67,9 @@ const CompletedSold = () => {
                   className="w-20 h-20 object-cover rounded-lg"
                 />
                 <div>
-                  <p className="text-lg font-semibold text-gray-800">{item.product.name}</p>
-                  <p className="text-gray-600">Quantity: {item.quantity}</p>
-                  <p className="text-gray-600">Price: ₹{item.product.price}</p>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-white">{item.product.name}</p>
+                  <p className="text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
+                  <p className="text-gray-600 dark:text-gray-300">Price: ₹{item.product.price}</p>
                 </div>
               </div>
             ))}
