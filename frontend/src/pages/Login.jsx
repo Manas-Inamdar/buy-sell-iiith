@@ -12,7 +12,7 @@ const Login = () => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
-      setToken(token); // Use context to set token
+      setToken(token);
       navigate('/');
     }
   }, [navigate, setToken]);
@@ -21,7 +21,6 @@ const Login = () => {
     const params = new URLSearchParams(window.location.search);
     const ticket = params.get('ticket');
     if (ticket) {
-      // POST ticket and service to backend
       axios
         .post('http://localhost:4000/api/user/cas-validate', {
           ticket,
@@ -29,9 +28,8 @@ const Login = () => {
         })
         .then((res) => {
           if (res.data.success) {
-            setToken(res.data.token); // Use context to set token
+            setToken(res.data.token);
             if (res.data.isNewUser) {
-              // Redirect to Register page with email in query
               navigate(`/register?email=${res.data.user.email}`);
             } else {
               navigate('/');
@@ -53,48 +51,30 @@ const Login = () => {
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        minHeight: '100vh',
-        minWidth: '100vw',
-        background:
-          'linear-gradient(120deg, #6a11cb 0%, #2575fc 50%, #43e97b 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 0,
-        overflow: 'hidden',
-      }}
+      className="fixed inset-0 min-h-screen min-w-screen flex items-center justify-center z-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-400 to-green-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300"
     >
-      {/* 🔳 Uniform Dot Pattern Overlay */}
+      {/* Dot Pattern Overlay */}
       <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          position: 'absolute',
-          inset: 0,
           backgroundImage: 'radial-gradient(#ffffff80 1px, transparent 1px)',
           backgroundSize: '20px 20px',
           zIndex: 0,
-          pointerEvents: 'none',
         }}
       ></div>
 
-      {/* 💳 Login Card */}
+      {/* Login Card */}
       <div
-        className="rounded-3xl shadow-2xl px-12 py-16 flex flex-col items-center"
+        className="rounded-3xl shadow-2xl px-12 py-16 flex flex-col items-center bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700"
         style={{
-          background: 'rgba(255,255,255,0.97)',
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.25)',
-          border: '2px solid #e0e7ef',
           minWidth: 350,
           maxWidth: '90vw',
           zIndex: 1,
         }}
       >
         <h1
-          className="text-5xl font-extrabold mb-10 text-center tracking-wide"
+          className="text-5xl font-extrabold mb-10 text-center tracking-wide text-gray-900 dark:text-white"
           style={{
-            color: '#1e293b',
             letterSpacing: '2px',
             textShadow: '0 2px 8px #cbd5e1',
           }}
@@ -103,18 +83,13 @@ const Login = () => {
         </h1>
         <button
           onClick={handleCASLogin}
-          className="transition-all text-white px-12 py-5 rounded-2xl text-2xl font-bold shadow-xl focus:outline-none focus:ring-4"
-          style={{
-            background: 'linear-gradient(90deg, #2563eb 0%, #6a11cb 100%)',
-            boxShadow: '0 4px 24px 0 #2563eb55, 0 1.5px 8px 0 #6a11cb55',
-            border: 'none',
-          }}
+          className="transition-all text-white px-12 py-5 rounded-2xl text-2xl font-bold shadow-xl focus:outline-none focus:ring-4 bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-900"
         >
           Login with IIIT CAS
         </button>
         <div className="mt-8 flex gap-2 items-center">
           <span className="w-3 h-3 rounded-full bg-blue-400 animate-pulse"></span>
-          <span className="text-blue-700 font-medium text-sm">
+          <span className="text-blue-700 dark:text-blue-300 font-medium text-sm">
             Secure IIIT SSO Login
           </span>
         </div>

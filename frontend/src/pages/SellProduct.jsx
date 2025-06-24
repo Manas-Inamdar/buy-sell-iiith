@@ -102,11 +102,11 @@ const SellPage = () => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="flex flex-col items-center w-[90%] sm:max-w-lg m-auto mt-10 gap-6 text-gray-800 bg-white shadow-lg rounded-lg p-8"
+            className="flex flex-col items-center w-[90%] sm:max-w-lg m-auto mt-10 gap-6 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-8"
         >
             <div className="inline-flex items-center gap-2 mb-4">
-                <p className="text-3xl font-bold text-gray-700">Sell an Item</p>
-                <hr className="border-none h-[2px] w-12 bg-gray-800" />
+                <p className="text-3xl font-bold text-gray-700 dark:text-white">Sell an Item</p>
+                <hr className="border-none h-[2px] w-12 bg-gray-800 dark:bg-gray-200" />
             </div>
 
             <input
@@ -114,7 +114,7 @@ const SellPage = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
+                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-md outline-none shadow-sm dark:bg-gray-800 dark:text-gray-100"
                 placeholder="Item Title"
                 required
             />
@@ -123,7 +123,7 @@ const SellPage = () => {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
+                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-md outline-none shadow-sm dark:bg-gray-800 dark:text-gray-100"
                 placeholder="Item Description"
                 rows="4"
                 required
@@ -134,7 +134,7 @@ const SellPage = () => {
                 name="price"
                 value={formData.price}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
+                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-md outline-none shadow-sm dark:bg-gray-800 dark:text-gray-100"
                 placeholder="Price (in Rs)"
                 min="1"
                 required
@@ -144,7 +144,7 @@ const SellPage = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
+                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-md outline-none shadow-sm dark:bg-gray-800 dark:text-gray-100"
                 required
             >
                 <option value="">Select Category</option>
@@ -160,7 +160,7 @@ const SellPage = () => {
                     name="subCategory"
                     value={formData.subCategory}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-md outline-none shadow-sm dark:bg-gray-800 dark:text-gray-100"
                     required
                 >
                     <option value="">Select Sub-Category</option>
@@ -173,13 +173,13 @@ const SellPage = () => {
             )}
 
             <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image URL</label>
                 <input
                     type="text"
                     name="imageUrl"
                     value={formData.imageUrl}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-blue-500 rounded-md outline-none shadow-sm"
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 focus:border-blue-500 rounded-md outline-none shadow-sm dark:bg-gray-800 dark:text-gray-100"
                     placeholder="Enter Image URL"
                     required
                 />
@@ -196,13 +196,13 @@ const SellPage = () => {
             )}
 
             {error && (
-                <div className="text-red-500 mt-2 font-bold bg-red-100 p-3 rounded-md w-full text-center">
+                <div className="text-red-500 mt-2 font-bold bg-red-100 dark:bg-red-900 p-3 rounded-md w-full text-center">
                     {error}
                 </div>
             )}
 
             {success && (
-                <div className="text-green-500 mt-2 font-bold bg-green-100 p-3 rounded-md w-full text-center">
+                <div className="text-green-500 mt-2 font-bold bg-green-100 dark:bg-green-900 p-3 rounded-md w-full text-center">
                     {success}
                 </div>
             )}

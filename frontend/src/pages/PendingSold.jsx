@@ -47,18 +47,18 @@ const PendingSold = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-900 dark:border-gray-200 border-t-transparent"></div>
       </div>
     );
   }
 
   if (!loading && orders.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 rounded-lg">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 dark:bg-gray-900 rounded-lg">
+        <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">
           No Pending Sales Found
         </h3>
-        <p className="text-gray-500 text-center max-w-sm">
+        <p className="text-gray-500 dark:text-gray-300 text-center max-w-sm">
           When customers buy your items, they will appear here
         </p>
       </div>
@@ -69,9 +69,9 @@ const PendingSold = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {orders.map((order) => (
-          <div key={order._id} className="bg-white shadow-lg rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Order ID: {order._id}</h2>
-            <p className="text-gray-600 mb-4">Buyer: {order.buyer}</p>
+          <div key={order._id} className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Order ID: {order._id}</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">Buyer: {order.buyer}</p>
             <div className="space-y-4">
               {order.items.map((item, index) => (
                 <div key={index} className="flex items-center gap-4">
@@ -81,20 +81,20 @@ const PendingSold = () => {
                     className="w-20 h-20 object-cover rounded-lg"
                   />
                   <div>
-                    <p className="text-lg font-semibold text-gray-800">{item.product.name}</p>
-                    <p className="text-gray-600">Quantity: {item.quantity}</p>
-                    <p className="text-gray-600">Price: ₹{item.product.price}</p>
+                    <p className="text-lg font-semibold text-gray-800 dark:text-white">{item.product.name}</p>
+                    <p className="text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
+                    <p className="text-gray-600 dark:text-gray-300">Price: ₹{item.product.price}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-100">
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
               <div className="flex flex-col items-center gap-4">
                 <input
                   type="text"
                   placeholder="Enter OTP"
                   maxLength="6"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg font-mono"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-center text-lg font-mono text-gray-900 dark:text-gray-100"
                   value={otp[order._id] || ''}
                   onChange={(e) => setOtp({ ...otp, [order._id]: e.target.value })}
                 />

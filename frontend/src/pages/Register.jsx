@@ -52,48 +52,48 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-indigo-500 to-green-400">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-indigo-500 to-green-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-2xl min-w-[320px] w-full max-w-md flex flex-col gap-4"
+        className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl min-w-[320px] w-full max-w-md flex flex-col gap-4"
       >
-        <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">Complete Your Registration</h2>
-        <label className="font-medium text-gray-700">
+        <h2 className="text-2xl font-bold text-center mb-2 text-gray-800 dark:text-white">Complete Your Registration</h2>
+        <label className="font-medium text-gray-700 dark:text-gray-200">
           Email:
           <input
             value={email}
             disabled
-            className="w-full mt-1 mb-2 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+            className="w-full mt-1 mb-2 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
           />
         </label>
-        <label className="font-medium text-gray-700">
+        <label className="font-medium text-gray-700 dark:text-gray-200">
           First Name:
           <input
             value={firstname}
             onChange={e => setFirstname(e.target.value)}
             required
-            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100"
             placeholder="Enter your first name"
           />
         </label>
-        <label className="font-medium text-gray-700">
+        <label className="font-medium text-gray-700 dark:text-gray-200">
           Last Name:
           <input
             value={lastname}
             onChange={e => setLastname(e.target.value)}
             required
-            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100"
             placeholder="Enter your last name"
           />
         </label>
-        <label className="font-medium text-gray-700">
+        <label className="font-medium text-gray-700 dark:text-gray-200">
           Contact Number:
           <input
             value={contactnumber}
             onChange={e => setContactnumber(e.target.value)}
             required
             maxLength={10}
-            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-gray-100"
             placeholder="10-digit mobile number"
             inputMode="numeric"
             pattern="\d*"
