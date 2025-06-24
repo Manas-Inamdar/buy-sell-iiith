@@ -16,7 +16,7 @@ const cas = new CAS({
 });
 
 // PATCH: Complete user profile after CAS login
-userRouter.patch('/profile', auth, completeProfile);
+userRouter.put('/profile', auth, completeProfile);
 
 // GET: Get user by email (optional)
 userRouter.get('/get/:email', getUserByEmail);

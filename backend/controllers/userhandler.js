@@ -84,20 +84,24 @@ const register = async (req, res) => {
 // PATCH /api/user/profile
 const completeProfile = async (req, res) => {
     try {
-        const { firstname, lastname, contactnumber, age } = req.body;
+        const { firstname, lastname, contactnumber } = req.body;
         const userId = req.user.id; // from JWT
 
-        if (!firstname || !lastname || !contactnumber || !age) {
+        if (!firstname || !lastname || !contactnumber) {
             return res.status(400).json({ message: "Please fill all the fields" });
         }
 
         const user = await userModel.findByIdAndUpdate(
             userId,
-            { firstname, lastname, contactnumber, age },
+            { firstname, lastname, contactnumber },
             { new: true }
         );
 
-        res.status(200).json({ message: "Profile updated", user });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user); // Return updated user directly
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }

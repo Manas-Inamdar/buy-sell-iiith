@@ -51,7 +51,7 @@ const Login = () => {
 
   return (
     <div
-      className="fixed inset-0 min-h-screen min-w-screen flex items-center justify-center z-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-400 to-green-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300"
+      className="fixed inset-0 min-h-screen min-w-screen flex items-center justify-center z-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-400 to-green-300 transition-colors duration-300"
     >
       {/* Dot Pattern Overlay */}
       <div
@@ -65,7 +65,7 @@ const Login = () => {
 
       {/* Login Card */}
       <div
-        className="rounded-3xl shadow-2xl px-12 py-16 flex flex-col items-center bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700"
+        className="rounded-3xl shadow-2xl px-12 py-16 flex flex-col items-center bg-white border-2 border-gray-200"
         style={{
           minWidth: 350,
           maxWidth: '90vw',
@@ -73,7 +73,7 @@ const Login = () => {
         }}
       >
         <h1
-          className="text-5xl font-extrabold mb-10 text-center tracking-wide text-gray-900 dark:text-white"
+          className="text-5xl font-extrabold mb-10 text-center tracking-wide text-gray-900"
           style={{
             letterSpacing: '2px',
             textShadow: '0 2px 8px #cbd5e1',
@@ -83,13 +83,13 @@ const Login = () => {
         </h1>
         <button
           onClick={handleCASLogin}
-          className="transition-all text-white px-12 py-5 rounded-2xl text-2xl font-bold shadow-xl focus:outline-none focus:ring-4 bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-900"
+          className="transition-all text-white px-12 py-5 rounded-2xl text-2xl font-bold shadow-xl focus:outline-none focus:ring-4 bg-gradient-to-r from-blue-600 to-indigo-700"
         >
           Login with IIIT CAS
         </button>
         <div className="mt-8 flex gap-2 items-center">
           <span className="w-3 h-3 rounded-full bg-blue-400 animate-pulse"></span>
-          <span className="text-blue-700 dark:text-blue-300 font-medium text-sm">
+          <span className="text-blue-700 font-medium text-sm">
             Secure IIIT SSO Login
           </span>
         </div>

@@ -17,22 +17,25 @@ const ALL_CATEGORIES = [
   "Miscellaneous"
 ];
 
+const CATEGORY_TYPE_MAP = {
+  Electronics: ["Mobile Phones", "Laptops", "Cameras", "Tablets", "Headphones", "Smart Watches", "Speakers", "Accessories"],
+  Furniture: ["Beds", "Sofas", "Chairs", "Tables", "Desks", "Wardrobes", "Shelves", "Drawers"],
+  Clothing: ["Men", "Women", "Kids", "T-Shirts", "Jeans", "Jackets", "Shoes"],
+  Books: ["Textbooks", "Novels", "Reference", "Comics", "Magazines", "Entrance Prep"],
+  Appliances: ["Kitchen Appliances", "Washing Machines", "Refrigerators", "Microwaves", "Fans", "Heaters"],
+  Sports: ["Cricket", "Football", "Badminton", "Gym Equipment", "Bicycles"],
+  Stationery: ["Notebooks", "Pens & Pencils", "Calculators", "Drawing Supplies", "Folders"],
+  Miscellaneous: ["Bags", "Watches", "Musical Instruments", "Games", "Others"]
+};
+
 const ALL_TYPES = [
-  // Electronics
   "Mobile Phones", "Laptops", "Cameras", "Tablets", "Headphones", "Smart Watches", "Speakers", "Accessories",
-  // Furniture
   "Beds", "Sofas", "Chairs", "Tables", "Desks", "Wardrobes", "Shelves", "Drawers",
-  // Clothing
   "Men", "Women", "Kids", "T-Shirts", "Jeans", "Jackets", "Shoes",
-  // Books
   "Textbooks", "Novels", "Reference", "Comics", "Magazines", "Entrance Prep",
-  // Appliances
   "Kitchen Appliances", "Washing Machines", "Refrigerators", "Microwaves", "Fans", "Heaters",
-  // Sports
   "Cricket", "Football", "Badminton", "Gym Equipment", "Bicycles",
-  // Stationery
   "Notebooks", "Pens & Pencils", "Calculators", "Drawing Supplies", "Folders",
-  // Miscellaneous
   "Bags", "Watches", "Musical Instruments", "Games", "Others"
 ];
 
@@ -97,17 +100,21 @@ const Collections = () => {
     setSortOption(variable);
   };
 
+  const filteredTypes = category.length === 0
+    ? ALL_TYPES
+    : category.flatMap(cat => CATEGORY_TYPE_MAP[cat] || []);
+
   return (
     <>
       {showSearch && (
-        <div className="border-t border-b bg-gray-50 text-center">
-          <div className="inline-flex items-center justify-center border border-gray-400 px-5 py-2 my-5 mx-3 rounded-full w-96">
+        <div className="border-t border-b bg-gray-50 dark:bg-gray-900 text-center transition-colors duration-300">
+          <div className="inline-flex items-center justify-center border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 px-5 py-2 my-5 mx-3 rounded-full w-96 shadow transition-colors duration-300">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               type="text"
               placeholder="Search"
-              className="flex-1 outline-none bg-white text-lg"
+              className="flex-1 outline-none bg-white dark:bg-gray-800 text-lg text-gray-900 dark:text-gray-100 border-none rounded-full px-4 py-2 transition-colors duration-300"
             />
           </div>
           <img
@@ -147,7 +154,7 @@ const Collections = () => {
           <div className={`border border-gray-300 dark:border-gray-700 pl-5 py-3 my-5 bg-white dark:bg-gray-800 rounded-lg ${filter ? "" : "hidden"} sm:block`}>
             <p className="mb-3 text-sm font-medium text-gray-900 dark:text-gray-100">TYPE</p>
             <div className="flex flex-col gap-2 text-sm font-light text-gray-700 dark:text-gray-300" style={{ maxHeight: 220, overflowY: "auto" }}>
-              {ALL_TYPES.map((subCat) => (
+              {filteredTypes.map((subCat) => (
                 <p className="flex gap-2" key={subCat}>
                   <input className="w-3 accent-blue-600" type="checkbox" value={subCat} onChange={toggle1} />
                   {subCat}
@@ -158,8 +165,13 @@ const Collections = () => {
         </div>
 
         <div className="flex-1">
-          <div className="flex justify-between items-center text-base sm:text-2xl mb-4">
-            <Title text1={"ALL"} text2={"COLLECTIONS"} />
+          <div className="flex justify-between items-center text-base sm:text-2xl mb-8">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 uppercase drop-shadow-lg">
+                ALL COLLECTIONS
+              </h2>
+              <div className="h-1 w-32 mt-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full"></div>
+            </div>
             <div className="flex items-center gap-4">
               <select
                 onChange={(e) => sort(e.target.value)}

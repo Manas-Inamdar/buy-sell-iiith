@@ -76,7 +76,7 @@ const GeminiChatbot = () => {
           </svg>
         </button>
       ) : (
-        <div className="w-80 h-[500px] bg-white border rounded-lg shadow-xl flex flex-col">
+        <div className="w-80 h-[500px] bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg shadow-xl flex flex-col">
           <div className="bg-blue-500 text-white p-3 flex justify-between items-center">
             <h3 className="font-bold">AI Assistant</h3>
             <button onClick={() => setIsOpen(false)}>
@@ -92,7 +92,7 @@ const GeminiChatbot = () => {
               msg.sender === 'ai' && msg.text ? (
                 <div
                   key={index}
-                  className="p-2 rounded-lg max-w-[80%] bg-gray-100 self-start"
+                  className="p-2 rounded-lg max-w-[80%] bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 self-start"
                   dangerouslySetInnerHTML={{ __html: msg.text }}
                 />
               ) : (
@@ -100,8 +100,8 @@ const GeminiChatbot = () => {
                   key={index}
                   className={`p-2 rounded-lg max-w-[80%] ${
                     msg.sender === 'user'
-                      ? 'bg-blue-100 self-end ml-auto'
-                      : 'bg-gray-100 self-start'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-gray-900 dark:text-gray-100 self-end ml-auto'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 self-start'
                   }`}
                 >
                   {msg.text || <span>Sorry, something went wrong.</span>}
@@ -109,7 +109,7 @@ const GeminiChatbot = () => {
               )
             ))}
             {isLoading && (
-              <div className="p-2 bg-gray-100 rounded-lg self-start">
+              <div className="p-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg self-start">
                 Generating response...
               </div>
             )}
@@ -122,7 +122,7 @@ const GeminiChatbot = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Type your message..."
-              className="flex-grow p-2 border rounded-l-lg"
+              className="flex-grow p-2 border rounded-l-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
               disabled={isLoading}
             />
             <button 

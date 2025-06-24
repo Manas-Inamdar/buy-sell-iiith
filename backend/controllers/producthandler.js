@@ -1,5 +1,20 @@
 import productModel from '../models/productmodel.js';
 
+// Allowed categories and types
+const ALL_CATEGORIES = [
+    "Electronics", "Furniture", "Clothing", "Books", "Appliances", "Sports", "Stationery", "Miscellaneous"
+];
+const CATEGORY_TYPE_MAP = {
+    Electronics: ["Mobile Phones", "Laptops", "Cameras", "Tablets", "Headphones", "Smart Watches", "Speakers", "Accessories"],
+    Furniture: ["Beds", "Sofas", "Chairs", "Tables", "Desks", "Wardrobes", "Shelves", "Drawers"],
+    Clothing: ["Men", "Women", "Kids", "T-Shirts", "Jeans", "Jackets", "Shoes"],
+    Books: ["Textbooks", "Novels", "Reference", "Comics", "Magazines", "Entrance Prep"],
+    Appliances: ["Kitchen Appliances", "Washing Machines", "Refrigerators", "Microwaves", "Fans", "Heaters"],
+    Sports: ["Cricket", "Football", "Badminton", "Gym Equipment", "Bicycles"],
+    Stationery: ["Notebooks", "Pens & Pencils", "Calculators", "Drawing Supplies", "Folders"],
+    Miscellaneous: ["Bags", "Watches", "Musical Instruments", "Games", "Others"]
+};
+
 const addproduct = async (req, res) => {
     const { title, price, description, category, subCategory, imageUrl } = req.body;
     const buyerEmail = req.user.email; // Use authenticated user's email
@@ -7,6 +22,15 @@ const addproduct = async (req, res) => {
     try {
         if (!title || !price || !description || !category || !subCategory || !imageUrl) {
             return res.status(400).json({ message: "Please fill all the fields" });
+        }
+
+        // Validate category
+        if (!ALL_CATEGORIES.includes(category)) {
+            return res.status(400).json({ message: "Invalid category" });
+        }
+        // Validate subCategory/type
+        if (!CATEGORY_TYPE_MAP[category] || !CATEGORY_TYPE_MAP[category].includes(subCategory)) {
+            return res.status(400).json({ message: "Invalid type for selected category" });
         }
 
         const product = await productModel.findOne({ name: title });
@@ -21,7 +45,7 @@ const addproduct = async (req, res) => {
             category: category,
             subCategory: subCategory,
             image: imageUrl,
-            buyer_email: buyerEmail, // <-- This is required by your schema
+            buyer_email: buyerEmail,
         });
 
         const savedProduct = await newProduct.save();

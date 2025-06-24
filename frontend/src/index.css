@@ -86,3 +86,8 @@ a.active hr
     color: white;
   }
 }
+
+/* Dark Mode Icon Inversion */
+.dark img.icon-invert {
+  filter: brightness(2) invert(1);
+}
