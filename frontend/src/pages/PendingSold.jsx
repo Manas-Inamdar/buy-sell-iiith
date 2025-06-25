@@ -84,6 +84,8 @@ const PendingSold = () => {
                     <p className="text-lg font-semibold text-gray-800 dark:text-white">{item.product.name}</p>
                     <p className="text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
                     <p className="text-gray-600 dark:text-gray-300">Price: ₹{item.product.price}</p>
+                    <p className="text-gray-600 dark:text-gray-300">Category: {item.product.category}</p>
+                    {/* Add more fields as needed */}
                   </div>
                 </div>
               ))}

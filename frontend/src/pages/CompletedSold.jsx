@@ -62,14 +62,27 @@ const CompletedSold = () => {
             {order.items.map((item, index) => (
               <div key={index} className="flex items-center gap-4">
                 <img
-                  src={item.product.image}
+                  src={
+                    item.product.image ||
+                    item.product.imageUrl ||
+                    item.product.img ||
+                    item.product.photo ||
+                    item.product.picture ||
+                    "/default-image.png"
+                  }
                   alt={item.product.name}
                   className="w-20 h-20 object-cover rounded-lg"
+                  onError={e => { e.target.src = "/default-image.png"; }}
                 />
                 <div>
                   <p className="text-lg font-semibold text-gray-800 dark:text-white">{item.product.name}</p>
                   <p className="text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
                   <p className="text-gray-600 dark:text-gray-300">Price: ₹{item.product.price}</p>
+                </div>
+                <div style={{color: 'orange', fontSize: '10px', wordBreak: 'break-all'}}>
+                  {Object.entries(item.product).map(([key, value]) => (
+                    <div key={key}>{key}: {String(value)}</div>
+                  ))}
                 </div>
               </div>
             ))}
