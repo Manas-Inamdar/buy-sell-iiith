@@ -122,19 +122,65 @@ app.post('/api/generate-text', async (req, res) => {
       ];
       const regexes = searchTerms.map(term => new RegExp(`\\b${escapeStringRegexp(term)}`, 'i'));
 
-      let products = await productModel.find({
-        $or: [
-          ...regexes.map(regex => ({ name: { $regex: regex } })),
-          ...regexes.map(regex => ({ description: { $regex: regex } }))
-        ]
-      }).limit(5);
+      // Category/type matching
+      const ALL_CATEGORIES = [
+        "electronics", "furniture", "clothing", "books", "appliances", "sports", "stationery", "miscellaneous", "food"
+      ];
+      const ALL_TYPES = [
+        "mobile phones", "smartphones", "feature phones", "laptops", "desktops", "cameras", "dslr", "mirrorless cameras",
+        "tablets", "headphones", "earphones", "smart watches", "speakers", "bluetooth devices", "monitors", "keyboards",
+        "mice", "chargers", "power banks", "accessories", "printers", "projectors", "routers", "wearables", "other",
+        "beds", "sofas", "chairs", "tables", "desks", "wardrobes", "shelves", "drawers", "mattresses", "cupboards",
+        "study tables", "dining sets", "bean bags", "stools", "shoe racks", "tv units", "bookshelves", "recliners",
+        "men", "women", "kids", "t-shirts", "shirts", "jeans", "trousers", "jackets", "sweaters", "dresses", "sarees",
+        "kurta/kurti", "shorts", "skirts", "shoes", "sandals", "sportswear", "ethnic wear", "bags", "belts", "caps",
+        "socks", "scarves", "gloves", "winter wear", "rain wear",
+        "textbooks", "novels", "reference", "comics", "magazines", "entrance prep", "competitive exams", "engineering",
+        "medical", "science", "math", "history", "biography", "children", "fiction", "non-fiction", "language learning",
+        "poetry", "self-help", "cookbooks", "travel", "art", "photography",
+        "kitchen appliances", "washing machines", "refrigerators", "microwaves", "fans", "heaters", "mixers/grinders",
+        "toasters", "air conditioners", "water purifiers", "geysers", "irons", "vacuum cleaners", "coffee makers",
+        "blenders", "rice cookers", "dishwashers", "juicers",
+        "cricket", "football", "badminton", "tennis", "table tennis", "basketball", "volleyball", "gym equipment",
+        "bicycles", "skates", "yoga mats", "dumbbells", "sports shoes", "rackets", "swim gear", "fitness trackers",
+        "camping gear",
+        "notebooks", "pens & pencils", "calculators", "drawing supplies", "folders", "files", "markers", "highlighters",
+        "sticky notes", "art supplies", "geometry boxes", "erasers", "sharpeners", "staplers", "desk organizers",
+        "planners", "diaries", "whiteboards",
+        "bags", "watches", "musical instruments", "games", "toys", "decor", "jewelry", "cosmetics", "gardening tools",
+        "pet supplies", "collectibles", "gift items", "handmade", "diy kits",
+        "snacks", "meals", "beverages", "homemade", "packaged", "bakery", "sweets", "chocolates", "ready-to-eat",
+        "frozen food", "dairy", "fruits", "vegetables", "health food", "vegan", "gluten-free", "non-veg", "eggless",
+        "organic", "dry fruits", "pickles", "sauces & dips", "breakfast", "lunch", "dinner", "street food"
+      ];
+
+      let products = [];
+
+      // If prompt matches a category, search by category
+      if (ALL_CATEGORIES.includes(promptLower)) {
+        products = await productModel.find({ category: new RegExp(`^${escapeStringRegexp(promptLower)}`, 'i') }).limit(5);
+      }
+      // If prompt matches a type, search by subCategory/type
+      else if (ALL_TYPES.includes(promptLower)) {
+        products = await productModel.find({ subCategory: new RegExp(`^${escapeStringRegexp(promptLower)}`, 'i') }).limit(5);
+      }
+
+      // If still no products, search by name/description as before
+      if (products.length === 0) {
+        products = await productModel.find({
+          $or: [
+            ...regexes.map(regex => ({ name: { $regex: regex } })),
+            ...regexes.map(regex => ({ description: { $regex: regex } }))
+          ]
+        }).limit(5);
+      }
 
       // Fuzzy search fallback if no products found
       if (products.length === 0) {
         const allProducts = await productModel.find({}, 'name description price');
         const fuse = new Fuse(allProducts, {
           keys: ['name', 'description'],
-          threshold: 0.4, // Lower = stricter, higher = fuzzier
+          threshold: 0.4,
         });
         const fuzzyResults = fuse.search(promptLower).slice(0, 5).map(r => r.item);
         products = fuzzyResults;

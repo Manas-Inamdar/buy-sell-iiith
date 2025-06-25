@@ -33,7 +33,7 @@ const productSchema = new mongoose.Schema({
         type: Number,
         // required: true
     },
-    buyer_email: {
+    seller_email: {
         type: String,
         required: true
     }

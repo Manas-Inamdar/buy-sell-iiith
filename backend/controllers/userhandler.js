@@ -70,11 +70,14 @@ const register = async (req, res) => {
 
         const token = jwt.sign(
             { id: newUser._id, firstname: newUser.firstname, lastname: newUser.lastname, age: newUser.age, contactnumber: newUser.contactnumber, email: newUser.email },
-            process.env.JWT_SECRET, // Use env variable here
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        
-        res.status(201).json({ message: "User registered successfully", token });
+
+        // Remove password from user object
+        const { password: removedPassword, ...userWithoutPassword } = newUser.toObject();
+
+        res.status(201).json({ status: "success", message: "User registered successfully", user: userWithoutPassword, token });
     } catch (error) {
         console.error(error);  
         res.status(500).json({ message: "Something went wrong" });

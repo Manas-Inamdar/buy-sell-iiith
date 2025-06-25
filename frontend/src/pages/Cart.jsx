@@ -178,9 +178,15 @@ const Cart = () => {
       name: "IIIT Market",
       description: "Cart Payment",
       order_id: order.id,
-      handler: function (response) {
+      handler: async function (response) {
         alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
-        // You can call your backend here to mark the order as paid
+        // Place order and show OTP
+        const orders = await addToOrders({ cart });
+        if (orders.length > 0) {
+          const otps = orders.map(order => order.otp).join('\n');
+          toast.success(`Order placed! OTP(s):\n${otps}`, { autoClose: false });
+          // Optionally clear cart here as well
+        }
       },
       prefill: {
         email: user?.email || "",

@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import CAS from 'cas-authentication';
 import auth from '../middleware/auth.js';
 import fetch from 'node-fetch'; // If not installed, run: npm install node-fetch
+import xml2js from 'xml2js'; // npm install xml2js
 
 const userRouter = express.Router();
 
@@ -23,6 +24,7 @@ userRouter.get('/get/:email', getUserByEmail);
 
 // GET: Get logged-in user profile
 userRouter.get('/profile', auth, async (req, res) => {
+  console.log(req.user); // Debug: log the user object to backend console
   res.json(req.user);
 });
 
@@ -34,28 +36,45 @@ userRouter.post('/cas-validate', async (req, res) => {
   }
 
   try {
-    const casValidationUrl = `https://login.iiit.ac.in/cas/validate?ticket=${ticket}&service=${service}`;
+    // Use CAS 2.0 protocol for better info
+    const casValidationUrl = `https://login.iiit.ac.in/cas/serviceValidate?ticket=${ticket}&service=${service}`;
     const response = await fetch(casValidationUrl);
     const casData = await response.text();
 
-    if (casData.startsWith("yes")) {
-      const [, username] = casData.split("\n");
-      let user = await User.findOne({ email: username });
-      let isNewUser = false;
-      if (!user) {
-        user = await User.create({ email: username });
-        isNewUser = true;
+    // Parse XML response
+    xml2js.parseString(casData, async (err, result) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: "CAS XML parse error" });
       }
+      const success = result['cas:serviceResponse'] && result['cas:serviceResponse']['cas:authenticationSuccess'];
+      if (success) {
+        const username = result['cas:serviceResponse']['cas:authenticationSuccess'][0]['cas:user'][0];
+        // If your CAS server provides email as an attribute, extract it here
+        // Otherwise, use username as email
+        let email = username;
+        // Optionally: check for attributes
+        const attrs = result['cas:serviceResponse']['cas:authenticationSuccess'][0]['cas:attributes'];
+        if (attrs && attrs[0] && attrs[0]['cas:email']) {
+          email = attrs[0]['cas:email'][0];
+        }
 
-      const token = jwt.sign(
-        { id: user._id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-      );
-      res.json({ success: true, token, user: { email: user.email }, isNewUser });
-    } else {
-      res.status(401).json({ success: false, message: "Invalid CAS ticket" });
-    }
+        let user = await User.findOneAndUpdate(
+          { email },
+          { $setOnInsert: { email } },
+          { new: true, upsert: true }
+        );
+        let isNewUser = !user.firstname && !user.lastname && !user.contactnumber;
+
+        const token = jwt.sign(
+          { id: user._id, email: user.email },
+          process.env.JWT_SECRET,
+          { expiresIn: '1h' }
+        );
+        res.json({ success: true, token, user: { email: user.email }, isNewUser });
+      } else {
+        res.status(401).json({ success: false, message: "Invalid CAS ticket" });
+      }
+    });
   } catch (error) {
     console.error("CAS validation error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });

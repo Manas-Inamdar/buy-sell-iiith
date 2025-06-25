@@ -2,22 +2,58 @@ import productModel from '../models/productmodel.js';
 
 // Allowed categories and types here
 const ALL_CATEGORIES = [
-    "Electronics", "Furniture", "Clothing", "Books", "Appliances", "Sports", "Stationery", "Miscellaneous"
+    "Electronics", "Furniture", "Clothing", "Books", "Appliances", "Sports", "Stationery", "Miscellaneous", "Food"
 ];
+
 const CATEGORY_TYPE_MAP = {
-    Electronics: ["Mobile Phones", "Laptops", "Cameras", "Tablets", "Headphones", "Smart Watches", "Speakers", "Accessories"],
-    Furniture: ["Beds", "Sofas", "Chairs", "Tables", "Desks", "Wardrobes", "Shelves", "Drawers"],
-    Clothing: ["Men", "Women", "Kids", "T-Shirts", "Jeans", "Jackets", "Shoes"],
-    Books: ["Textbooks", "Novels", "Reference", "Comics", "Magazines", "Entrance Prep"],
-    Appliances: ["Kitchen Appliances", "Washing Machines", "Refrigerators", "Microwaves", "Fans", "Heaters"],
-    Sports: ["Cricket", "Football", "Badminton", "Gym Equipment", "Bicycles"],
-    Stationery: ["Notebooks", "Pens & Pencils", "Calculators", "Drawing Supplies", "Folders"],
-    Miscellaneous: ["Bags", "Watches", "Musical Instruments", "Games", "Others"]
+    Electronics: [
+        "Mobile Phones", "Smartphones", "Feature Phones", "Laptops", "Desktops", "Cameras", "DSLR", "Mirrorless Cameras",
+        "Tablets", "Headphones", "Earphones", "Smart Watches", "Speakers", "Bluetooth Devices", "Monitors", "Keyboards",
+        "Mice", "Chargers", "Power Banks", "Accessories", "Printers", "Projectors", "Routers", "Wearables", "Other"
+    ],
+    Furniture: [
+        "Beds", "Sofas", "Chairs", "Tables", "Desks", "Wardrobes", "Shelves", "Drawers", "Mattresses", "Cupboards",
+        "Study Tables", "Dining Sets", "Bean Bags", "Stools", "Shoe Racks", "TV aUnits", "Bookshelves", "Recliners", "Other"
+    ],
+    Clothing: [
+        "Men", "Women", "Kids", "T-Shirts", "Shirts", "Jeans", "Trousers", "Jackets", "Sweaters", "Dresses", "Sarees",
+        "Kurta/Kurti", "Shorts", "Skirts", "Shoes", "Sandals", "Sportswear", "Ethnic Wear", "Accessories", "Bags",
+        "Belts", "Caps", "Socks", "Scarves", "Gloves", "Winter Wear", "Rain Wear", "Other"
+    ],
+    Books: [
+        "Textbooks", "Novels", "Reference", "Comics", "Magazines", "Entrance Prep", "Competitive Exams", "Engineering",
+        "Medical", "Science", "Math", "History", "Biography", "Children", "Fiction", "Non-Fiction", "Language Learning",
+        "Poetry", "Self-Help", "Cookbooks", "Travel", "Art", "Photography", "Other"
+    ],
+    Appliances: [
+        "Kitchen Appliances", "Washing Machines", "Refrigerators", "Microwaves", "Fans", "Heaters", "Mixers/Grinders",
+        "Toasters", "Air Conditioners", "Water Purifiers", "Geysers", "Irons", "Vacuum Cleaners", "Coffee Makers",
+        "Blenders", "Rice Cookers", "Dishwashers", "Juicers", "Other"
+    ],
+    Sports: [
+        "Cricket", "Football", "Badminton", "Tennis", "Table Tennis", "Basketball", "Volleyball", "Gym Equipment",
+        "Bicycles", "Skates", "Yoga Mats", "Dumbbells", "Sports Shoes", "Rackets", "Swim Gear", "Sportswear",
+        "Fitness Trackers", "Camping Gear", "Other"
+    ],
+    Stationery: [
+        "Notebooks", "Pens & Pencils", "Calculators", "Drawing Supplies", "Folders", "Files", "Markers", "Highlighters",
+        "Sticky Notes", "Art Supplies", "Geometry Boxes", "Erasers", "Sharpeners", "Staplers", "Desk Organizers",
+        "Planners", "Diaries", "Whiteboards", "Other"
+    ],
+    Miscellaneous: [
+        "Bags", "Watches", "Musical Instruments", "Games", "Toys", "Decor", "Jewelry", "Cosmetics", "Gardening Tools",
+        "Pet Supplies", "Collectibles", "Gift Items", "Handmade", "DIY Kits", "Other"
+    ],
+    Food: [
+        "Snacks", "Meals", "Beverages", "Homemade", "Packaged", "Bakery", "Sweets", "Chocolates", "Ready-to-eat",
+        "Frozen Food", "Dairy", "Fruits", "Vegetables", "Health Food", "Vegan", "Gluten-Free", "Non-Veg", "Eggless",
+        "Organic", "Dry Fruits", "Pickles", "Sauces & Dips", "Breakfast", "Lunch", "Dinner", "Street Food", "Other"
+    ]
 };
 
 const addproduct = async (req, res) => {
     const { title, price, description, category, subCategory, imageUrl } = req.body;
-    const buyerEmail = req.user.email; // Use authenticated user's email
+    const sellerEmail = req.user.email; // The logged-in user is the seller
 
     try {
         if (!title || !price || !description || !category || !subCategory || !imageUrl) {
@@ -45,7 +81,7 @@ const addproduct = async (req, res) => {
             category: category,
             subCategory: subCategory,
             image: imageUrl,
-            buyer_email: buyerEmail,
+            seller_email: sellerEmail, // <-- Correct field
         });
 
         const savedProduct = await newProduct.save();

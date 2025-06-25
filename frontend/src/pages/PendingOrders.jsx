@@ -8,6 +8,7 @@ const PendingOrders = () => {
   const { token } = useContext(ShopContext);
   const [loading, setLoading] = useState(true);
   const [otps, setOtps] = useState({});
+  const [verifyInputs, setVerifyInputs] = useState({}); // <-- Add this
 
   useEffect(() => {
     const fetchPendingOrders = async () => {
@@ -43,6 +44,20 @@ const PendingOrders = () => {
     } catch (error) {
       console.error('Failed to generate OTP:', error);
       toast.error("Failed to generate OTP");
+    }
+  };
+
+  const handleVerifyOTP = async (orderId) => {
+    try {
+      const otp = verifyInputs[orderId];
+      const response = await axios.post(`/api/order/verify-otp/${orderId}`, { otp }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Order marked as completed!");
+      // Optionally, remove the order from the list or refresh
+      setOrders(prev => prev.filter(order => order._id !== orderId));
+    } catch (error) {
+      toast.error("Invalid OTP or failed to verify.");
     }
   };
 
@@ -84,7 +99,7 @@ const PendingOrders = () => {
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                 {otps[order._id] ? (
-                  <div className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                  <div className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg p-4 mb-4">
                     <p className="text-green-700 dark:text-green-300 font-semibold mb-2">OTP Generated</p>
                     <div className="flex gap-2 justify-center">
                       {otps[order._id].split('').map((digit, index) => (
@@ -100,11 +115,33 @@ const PendingOrders = () => {
                 ) : (
                   <button
                     onClick={() => handleGenerateOTP(order._id)}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mb-4"
                   >
                     Generate OTP
                   </button>
                 )}
+
+                {/* OTP Verification UI */}
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="text"
+                    placeholder="Enter OTP"
+                    value={verifyInputs[order._id] || ""}
+                    onChange={e =>
+                      setVerifyInputs(prev => ({
+                        ...prev,
+                        [order._id]: e.target.value
+                      }))
+                    }
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                  <button
+                    onClick={() => handleVerifyOTP(order._id)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  >
+                    Verify OTP
+                  </button>
+                </div>
               </div>
             </div>
           ))}

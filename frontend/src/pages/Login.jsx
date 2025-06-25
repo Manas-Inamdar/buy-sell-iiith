@@ -28,18 +28,29 @@ const Login = () => {
         })
         .then((res) => {
           if (res.data.success) {
+            toast.dismiss(); // Dismiss any previous error toasts
             setToken(res.data.token);
-            if (res.data.isNewUser) {
-              navigate(`/register?email=${res.data.user.email}`);
-            } else {
-              navigate('/');
-            }
+            setTimeout(() => {
+              if (res.data.isNewUser) {
+                // Do NOT show error toast for new users, just redirect to registration
+                navigate(`/register?email=${res.data.user.email}`);
+              } else {
+                navigate('/');
+              }
+            }, 100);
           } else {
             toast.error("CAS validation failed");
           }
         })
-        .catch(() => {
-          toast.error("Login failed. Please try again.");
+        .catch((err) => {
+          // Only show error if CAS validation truly failed and not if we are navigating to registration
+          if (
+            !err.response ||
+            !err.response.data ||
+            !err.response.data.isNewUser
+          ) {
+            toast.error("Login failed. Please try again.");
+          }
         });
     }
   }, [navigate, setToken]);
