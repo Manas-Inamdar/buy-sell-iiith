@@ -137,6 +137,9 @@ const Cart = () => {
   const handleBuyNow = async () => {
     const orders = await addToOrders({ cart });
     if (orders.length > 0) {
+      // Show OTP(s) to user
+      const otps = orders.map(order => order.otp).join('\n');
+      toast.success(`Order placed! OTP(s):\n${otps}`, { autoClose: false });
       try {
         const token = localStorage.getItem('token');
         await axios.post('/api/cart/clear', {}, {
@@ -152,6 +155,41 @@ const Cart = () => {
         toast.error("Failed to clear cart after purchase");
       }
     }
+  };
+
+  const handleRazorpayPayment = async () => {
+    const token = localStorage.getItem('token');
+    // 1. Create order on backend
+    const res = await fetch('/api/payment/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ amount: total }), // total is in INR
+    });
+    const order = await res.json();
+
+    // 2. Open Razorpay checkout
+    const options = {
+      key: "rzp_test_hvi1z6Sogsa8FF", // Your Razorpay key_id
+      amount: order.amount,
+      currency: order.currency,
+      name: "IIIT Market",
+      description: "Cart Payment",
+      order_id: order.id,
+      handler: function (response) {
+        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+        // You can call your backend here to mark the order as paid
+      },
+      prefill: {
+        email: user?.email || "",
+        contact: "",
+      },
+      theme: { color: "#3399cc" },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   if (!cart || cart.length === 0) {
@@ -253,7 +291,7 @@ const Cart = () => {
               </div>
             );
           })}
-        </div>
+        </div>  
 
         {/* Total*/}
         <div className="mt-10 text-right space-y-4">
@@ -262,9 +300,15 @@ const Cart = () => {
           </p>
           <button
             onClick={handleBuyNow}
-            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200 mr-4"
           >
-            Buy Now
+            Buy Now (OTP)
+          </button>
+          <button
+            onClick={handleRazorpayPayment}
+            className="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200"
+          >
+            Pay with Razorpay
           </button>
         </div>
       </div>

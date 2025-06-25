@@ -14,7 +14,8 @@ const Navbar = () => {
     const handleLogout = () => {
         setToken(null);
         localStorage.removeItem('token');
-        navigate('/login');
+        // Redirect to CAS logout (replace service URL with your deployed app if needed)
+        window.location.href = "https://login.iiit.ac.in/cas/logout?service=http://localhost:5173/login";
     };
 
     const fetchCartCount = async () => {

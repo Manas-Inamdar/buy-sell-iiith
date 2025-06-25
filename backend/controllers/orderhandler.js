@@ -13,7 +13,7 @@ const addOrder = async (req, res) => {
         for (const item of cart) {
             // Lookup product in DB to get the seller's email
             const product = await Product.findById(item.product._id);
-            if (!product) continue; // skip if not found
+            if (!product) continue; // skip if not found    
 
             const otp = Math.floor(100000 + Math.random() * 900000).toString();
             const hashedOtp = await bcrypt.hash(otp, 10);
