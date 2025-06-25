@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import { ShopContext } from '../context/ShopContext';
@@ -7,6 +7,7 @@ import { ShopContext } from '../context/ShopContext';
 const Login = () => {
   const navigate = useNavigate();
   const { setToken } = useContext(ShopContext);
+  const handled = useRef(false); // <-- Add this line
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -20,21 +21,24 @@ const Login = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ticket = params.get('ticket');
-    if (ticket) {
+    if (ticket && !handled.current) { // <-- Only run if not handled
+      handled.current = true; // <-- Set as handled
       axios
         .post('http://localhost:4000/api/user/cas-validate', {
           ticket,
           service: 'http://localhost:5173/login',
         })
         .then((res) => {
+          console.log("CAS validate response:", res.data);
           if (res.data.success) {
-            toast.dismiss(); // Dismiss any previous error toasts
+            toast.dismiss();
             setToken(res.data.token);
             setTimeout(() => {
               if (res.data.isNewUser) {
-                // Do NOT show error toast for new users, just redirect to registration
+                console.log("Redirecting to registration for new user:", res.data.user.email);
                 navigate(`/register?email=${res.data.user.email}`);
               } else {
+                console.log("Redirecting to home for existing user");
                 navigate('/');
               }
             }, 100);
@@ -43,6 +47,7 @@ const Login = () => {
           }
         })
         .catch((err) => {
+          console.log("CAS validate error:", err?.response?.data || err.message);
           // Only show error if CAS validation truly failed and not if we are navigating to registration
           if (
             !err.response ||
