@@ -79,11 +79,6 @@ const CompletedSold = () => {
                   <p className="text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
                   <p className="text-gray-600 dark:text-gray-300">Price: ₹{item.product.price}</p>
                 </div>
-                <div style={{color: 'orange', fontSize: '10px', wordBreak: 'break-all'}}>
-                  {Object.entries(item.product).map(([key, value]) => (
-                    <div key={key}>{key}: {String(value)}</div>
-                  ))}
-                </div>
               </div>
             ))}
           </div>
