@@ -19,6 +19,11 @@ import { ChatProvider } from './context/ChatContext';
 import GlobalChatbox from './components/GlobalChatbox';
 import { useChat } from './context/ChatContext';
 import ChatBox from './components/Chatbox.jsx';
+import { AuthProvider } from './context/AuthContext';
+
+import About from './pages/About';
+import CommunityGuidelines from './pages/CommunityGuidelines';
+import ContactSupport from './pages/ContactSupport';
 
 const AppContent = () => {
   const location = useLocation();
@@ -44,6 +49,9 @@ const AppContent = () => {
           <Route path='/profile/:userId' element={<Profile />} />
           <Route path='/sell' element={<SellProduct />} />
           <Route path='/sold' element={<SoldItems />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/guidelines' element={<CommunityGuidelines />} />
+          <Route path='/contact' element={<ContactSupport />} />
         </Route>
       </Routes>
       <GlobalChatbox />
@@ -58,9 +66,11 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <ChatProvider>
-    <AppContent />
-  </ChatProvider>
+  <AuthProvider>
+    <ChatProvider>
+      <AppContent />
+    </ChatProvider>
+  </AuthProvider>
 );
 
 export default App;
