@@ -3,10 +3,12 @@ import React, { useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import { ShopContext } from '../context/ShopContext';
+import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const { setToken } = useContext(ShopContext);
+  const { login: setAuthUser } = useContext(AuthContext);
   const handled = useRef(false); // <-- Add this line
 
   useEffect(() => {
@@ -33,6 +35,7 @@ const Login = () => {
           if (res.data.success) {
             toast.dismiss();
             setToken(res.data.token);
+            setAuthUser(res.data.user); // <-- This sets the user in AuthContext
             setTimeout(() => {
               if (res.data.isNewUser) {
                 console.log("Redirecting to registration for new user:", res.data.user.email);
@@ -58,7 +61,7 @@ const Login = () => {
           }
         });
     }
-  }, [navigate, setToken]);
+  }, [navigate, setToken, setAuthUser]);
 
   const handleCASLogin = () => {
     const service = encodeURIComponent('http://localhost:5173/login');

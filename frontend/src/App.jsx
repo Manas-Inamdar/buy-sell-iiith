@@ -65,12 +65,14 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
-  <AuthProvider>
-    <ChatProvider>
-      <AppContent />
-    </ChatProvider>
-  </AuthProvider>
-);
+function App() {
+  return (
+    <AuthProvider>
+      <ChatProvider>
+        <AppContent />
+      </ChatProvider>
+    </AuthProvider>
+  );
+}
 
 export default App;
