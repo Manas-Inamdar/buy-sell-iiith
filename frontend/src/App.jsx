@@ -18,6 +18,7 @@ import Register from './pages/Register';
 import { ChatProvider } from './context/ChatContext';
 import GlobalChatbox from './components/GlobalChatbox';
 import { useChat } from './context/ChatContext';
+import ChatBox from './components/Chatbox.jsx';
 
 const AppContent = () => {
   const location = useLocation();
@@ -45,15 +46,13 @@ const AppContent = () => {
           <Route path='/sold' element={<SoldItems />} />
         </Route>
       </Routes>
-      {/* Floating Chat Button */}
-      <button
-        className="fixed bottom-24 right-4 z-40 bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
-        onClick={() => openChat('support@iiith.com')}
-        title="Open Chat"
-      >
-        💬
-      </button>
       <GlobalChatbox />
+      <div
+        className="fixed right-8 z-50"
+        style={{ bottom: '110px', minWidth: 350, maxWidth: 400 }}
+      >
+        <ChatBox />
+      </div>
     </div>
   );
 };

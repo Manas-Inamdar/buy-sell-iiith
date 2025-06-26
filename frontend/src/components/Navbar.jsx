@@ -47,16 +47,32 @@ const Navbar = () => {
     }, [user, cartdata]);
 
     const Logo = () => (
-        <div className="flex items-center gap-2">
-          <svg 
-            className="w-8 h-8 text-blue-600" 
-            viewBox="0 0 24 24" 
-            fill="currentColor"
+        <div className="flex items-center gap-4">
+          {/* Beautiful, detailed shopping cart logo */}
+          <svg
+            className="w-14 h-14"
+            viewBox="0 0 56 56"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            {/* Cart basket */}
+            <rect x="10" y="18" width="36" height="18" rx="4" fill="#2563eb" stroke="#1e40af" strokeWidth="2"/>
+            {/* Cart handle */}
+            <path d="M14 18c0-6 8-10 14-10s14 4 14 10" stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Cart wheels */}
+            <circle cx="18" cy="40" r="4" fill="#1e40af" stroke="#2563eb" strokeWidth="2"/>
+            <circle cx="38" cy="40" r="4" fill="#1e40af" stroke="#2563eb" strokeWidth="2"/>
+            {/* Cart grid lines */}
+            <line x1="18" y1="22" x2="18" y2="32" stroke="#fff" strokeWidth="1.5"/>
+            <line x1="28" y1="22" x2="28" y2="32" stroke="#fff" strokeWidth="1.5"/>
+            <line x1="38" y1="22" x2="38" y2="32" stroke="#fff" strokeWidth="1.5"/>
+            <line x1="14" y1="26" x2="42" y2="26" stroke="#fff" strokeWidth="1.2"/>
+            <line x1="14" y1="30" x2="42" y2="30" stroke="#fff" strokeWidth="1.2"/>
+            {/* Subtle shadow */}
+            <ellipse cx="28" cy="48" rx="16" ry="2.5" fill="#e0e7ef" />
           </svg>
-          <span className="text-xl font-bold text-gray-800 dark:text-gray-100">
-            IIIT<span className="text-blue-600">Market</span>
+          <span className="text-2xl font-extrabold text-gray-800 dark:text-gray-100 tracking-tight">
+            IIITH <span className="text-blue-700">TradeZone</span>
           </span>
         </div>
       );

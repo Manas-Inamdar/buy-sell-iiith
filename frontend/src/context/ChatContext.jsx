@@ -1,22 +1,26 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const ChatContext = createContext();
 
 export const useChat = () => useContext(ChatContext);
 
 export const ChatProvider = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [otherUser, setOtherUser] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatRecipient, setChatRecipient] = useState(null);
 
-  const openChat = (user) => {
-    setOtherUser(user);
-    setIsOpen(true);
+  const openChat = (recipientEmail) => {
+    setChatRecipient(recipientEmail);
+    setIsChatOpen(true);
   };
 
-  const closeChat = () => setIsOpen(false);
-
   return (
-    <ChatContext.Provider value={{ isOpen, openChat, closeChat, otherUser }}>
+    <ChatContext.Provider value={{
+      isChatOpen,
+      setIsChatOpen,
+      chatRecipient,
+      setChatRecipient,
+      openChat,
+    }}>
       {children}
     </ChatContext.Provider>
   );

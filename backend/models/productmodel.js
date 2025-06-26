@@ -36,6 +36,10 @@ const productSchema = new mongoose.Schema({
     seller_email: {
         type: String,
         required: true
+    },
+    buyer_email: {
+        type: String,
+        // required: true
     }
     // rating and reviewsCount removed
 }, { minimize: false });

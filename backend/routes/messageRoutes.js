@@ -30,4 +30,17 @@ router.get('/history', async (req, res) => {
   }
 });
 
+// Get all unique chat users for a given user
+router.get('/chat-users/:userEmail', async (req, res) => {
+  const { userEmail } = req.params;
+  try {
+    const sent = await Message.find({ sender: userEmail }).distinct('receiver');
+    const received = await Message.find({ receiver: userEmail }).distinct('sender');
+    const users = Array.from(new Set([...sent, ...received])).filter(email => email !== userEmail);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch chat users' });
+  }
+});
+
 export default router;

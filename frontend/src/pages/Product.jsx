@@ -55,7 +55,7 @@ const Product = () => {
   }, [productId]);
 
   const handleAddToCart = async () => {
-    if (productdata.buyer_email === user.email) {
+    if (productdata.seller_email === user.email) {
       toast.error("You can't buy your own product");
       return;
     }
@@ -96,6 +96,22 @@ const Product = () => {
       toast.error(error.message || 'Failed to add to cart. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMessageSeller = async () => {
+    try {
+      await axios.put(`/api/product/buyer/${productdata._id}`, {
+        buyer_email: user.email,
+      });
+      // Refresh product data to get updated buyer_email
+      const response = await axios.get('/api/product/list');
+      const data = response.data;
+      const product = data.find((product) => product._id === productdata._id);
+      setproductdata(product);
+      openChat(productdata.seller_email);
+    } catch (error) {
+      toast.error("Failed to start chat with seller");
     }
   };
 
@@ -143,10 +159,20 @@ const Product = () => {
                         </div>
                         {user && productdata && productdata.seller_email && user.email !== productdata.seller_email && (
                           <button
-                            className="bg-blue-600 text-white px-4 py-2 rounded ml-4"
-                            onClick={() => openChat(productdata.seller_email)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition ml-4"
+                            style={{ minWidth: 140 }}
+                            onClick={handleMessageSeller}
                           >
                             Message Seller
+                          </button>
+                        )}
+                        {user && productdata && productdata.seller_email && user.email === productdata.seller_email && productdata.buyer_email && (
+                          <button
+                            className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition ml-4"
+                            style={{ minWidth: 140 }}
+                            onClick={() => openChat(productdata.buyer_email)}
+                          >
+                            Message Buyer
                           </button>
                         )}
                       </div>
@@ -231,18 +257,6 @@ const Product = () => {
                           </div>
                         </div>
                       </div>
-
-                      {/* Message Seller Button - REMOVE THIS DUPLICATE */}
-                      {/* 
-                      {user && productdata && productdata.seller_email && user.email !== productdata.seller_email && (
-                        <button
-                          className="bg-blue-600 text-white px-4 py-2 rounded ml-4"
-                          onClick={() => openChat(productdata.seller_email)}
-                        >
-                          Message Seller
-                        </button>
-                      )} 
-                      */}
                     </div>
                   </div>
                 </div>
