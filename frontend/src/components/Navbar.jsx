@@ -47,31 +47,45 @@ const Navbar = () => {
     }, [user, cartdata]);
 
     const Logo = () => (
-        <div className="flex items-center gap-4">
-          {/* Beautiful, detailed shopping cart logo */}
+        <div className="flex items-center gap-5">
+          {/* Fast shopping cart logo with handles */}
           <svg
-            className="w-14 h-14"
-            viewBox="0 0 56 56"
+            className="w-28 h-20"
+            viewBox="0 0 140 80"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Cart basket */}
-            <rect x="10" y="18" width="36" height="18" rx="4" fill="#2563eb" stroke="#1e40af" strokeWidth="2"/>
+            {/* Speed lines */}
+            <g>
+              <line x1="10" y1="35" x2="50" y2="35" stroke="#fb8500" strokeWidth="4" />
+              <line x1="10" y1="45" x2="40" y2="45" stroke="#fb8500" strokeWidth="3" />
+              <line x1="15" y1="55" x2="35" y2="55" stroke="#fb8500" strokeWidth="2" />
+              <line x1="20" y1="25" x2="55" y2="25" stroke="#fb8500" strokeWidth="2" />
+              <line x1="25" y1="65" x2="45" y2="65" stroke="#fb8500" strokeWidth="1.5" />
+            </g>
             {/* Cart handle */}
-            <path d="M14 18c0-6 8-10 14-10s14 4 14 10" stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            {/* Cart wheels */}
-            <circle cx="18" cy="40" r="4" fill="#1e40af" stroke="#2563eb" strokeWidth="2"/>
-            <circle cx="38" cy="40" r="4" fill="#1e40af" stroke="#2563eb" strokeWidth="2"/>
-            {/* Cart grid lines */}
-            <line x1="18" y1="22" x2="18" y2="32" stroke="#fff" strokeWidth="1.5"/>
-            <line x1="28" y1="22" x2="28" y2="32" stroke="#fff" strokeWidth="1.5"/>
-            <line x1="38" y1="22" x2="38" y2="32" stroke="#fff" strokeWidth="1.5"/>
-            <line x1="14" y1="26" x2="42" y2="26" stroke="#fff" strokeWidth="1.2"/>
-            <line x1="14" y1="30" x2="42" y2="30" stroke="#fff" strokeWidth="1.2"/>
-            {/* Subtle shadow */}
-            <ellipse cx="28" cy="48" rx="16" ry="2.5" fill="#e0e7ef" />
+            <line x1="50" y1="20" x2="40" y2="8" stroke="#2196f3" strokeWidth="6" strokeLinecap="round" />
+            {/* Cart body */}
+            <polyline
+              points="50,20 120,20 110,60 60,60 50,20"
+              fill="none"
+              stroke="#2196f3"
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            {/* Cart grid */}
+            <line x1="65" y1="25" x2="105" y2="25" stroke="#2196f3" strokeWidth="2"/>
+            <line x1="67" y1="35" x2="103" y2="35" stroke="#2196f3" strokeWidth="2"/>
+            <line x1="69" y1="45" x2="101" y2="45" stroke="#2196f3" strokeWidth="2"/>
+            <line x1="71" y1="55" x2="99" y2="55" stroke="#2196f3" strokeWidth="2"/>
+            <line x1="75" y1="25" x2="75" y2="60" stroke="#2196f3" strokeWidth="2"/>
+            <line x1="85" y1="25" x2="85" y2="60" stroke="#2196f3" strokeWidth="2"/>
+            <line x1="95" y1="25" x2="95" y2="60" stroke="#2196f3" strokeWidth="2"/>
+            {/* Wheels */}
+            <circle cx="70" cy="68" r="7" fill="#2196f3" />
+            <circle cx="105" cy="68" r="7" fill="#2196f3" />
           </svg>
-          <span className="text-2xl font-extrabold text-gray-800 dark:text-gray-100 tracking-tight">
+          <span className="text-3xl font-extrabold text-gray-800 dark:text-gray-100 tracking-tight">
             IIITH <span className="text-blue-700">TradeZone</span>
           </span>
         </div>
