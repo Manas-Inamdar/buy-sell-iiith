@@ -15,6 +15,7 @@ import productModel from './models/productmodel.js'; // Make sure this import is
 import escapeStringRegexp from 'escape-string-regexp'; // Add this at the top (npm i escape-string-regexp)
 import pluralize from 'pluralize'; // npm install pluralize
 import Fuse from 'fuse.js'; // <-- Add this at the top with your other imports
+import messageRoutes from './routes/messageRoutes.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -45,6 +46,7 @@ app.use('/api/cart', router);
 app.use('/api/order', orderRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/payment', paymentRouter);
+app.use('/api/messages', messageRoutes);
 
 // Gemini Text Generation
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY);

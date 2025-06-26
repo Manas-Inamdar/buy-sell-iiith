@@ -15,11 +15,14 @@ import ProtectedRoute from './components/Protected.jsx';
 import Cart from './pages/Cart.jsx';
 import SoldItems from './pages/SoldItems.jsx';
 import Register from './pages/Register';
+import { ChatProvider } from './context/ChatContext';
+import GlobalChatbox from './components/GlobalChatbox';
+import { useChat } from './context/ChatContext';
 
-
-const App = () => {
+const AppContent = () => {
   const location = useLocation();
   const hideNavbar = location.pathname === "/login";
+  const { openChat } = useChat();
 
   return (
     <div className="min-h-screen px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -41,10 +44,24 @@ const App = () => {
           <Route path='/sell' element={<SellProduct />} />
           <Route path='/sold' element={<SoldItems />} />
         </Route>
-        {/* </Route> */}
       </Routes>
-    </div >
+      {/* Floating Chat Button */}
+      <button
+        className="fixed bottom-24 right-4 z-40 bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
+        onClick={() => openChat('support@iiith.com')}
+        title="Open Chat"
+      >
+        💬
+      </button>
+      <GlobalChatbox />
+    </div>
   );
 };
+
+const App = () => (
+  <ChatProvider>
+    <AppContent />
+  </ChatProvider>
+);
 
 export default App;

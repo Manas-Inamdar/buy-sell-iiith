@@ -4,11 +4,13 @@ import { ShopContext } from '../context/ShopContext.jsx';
 import {jwtDecode} from 'jwt-decode';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { useChat } from '../context/ChatContext';
 
 const Product = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
   const { cartcount, setCartCount, user, currency, token } = useContext(ShopContext);
+  const { openChat } = useChat();
   const [productdata, setproductdata] = useState(null);
   const [image, setimage] = useState('');
   const [sizes, setsizes] = useState('');
@@ -38,7 +40,7 @@ const Product = () => {
         const product = data.find((product) => product._id === productId);
         setproductdata(product);
         if (product) {
-          const response1 = await axios.get(`/api/user/email/${product.buyer_email}`);
+          const response1 = await axios.get(`/api/user/email/${product.seller_email}`);
           setSellerInfo(response1.data);
         }
         setLoading(false);
@@ -135,8 +137,18 @@ const Product = () => {
                   <div className="flex flex-col h-full">
                     <div className="mb-8">
                       <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{productdata.name}</h1>
-                      <div className="text-5xl font-bold text-gray-900 dark:text-white mb-8">
-                        {currency}{productdata.price}
+                      <div className="flex items-start justify-between mb-8">
+                        <div className="text-5xl font-bold text-gray-900 dark:text-white">
+                          {currency}{productdata.price}
+                        </div>
+                        {user && productdata && productdata.seller_email && user.email !== productdata.seller_email && (
+                          <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded ml-4"
+                            onClick={() => openChat(productdata.seller_email)}
+                          >
+                            Message Seller
+                          </button>
+                        )}
                       </div>
                       <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
                         Description:
@@ -157,6 +169,7 @@ const Product = () => {
                           <p className="font-medium text-gray-900 dark:text-gray-100">{productdata.subCategory}</p>
                         </div>
                       </div>
+                      {/* Seller Information */}
                       {sellerInfo && (
                         <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
                           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Seller Information</h2>
@@ -219,8 +232,17 @@ const Product = () => {
                         </div>
                       </div>
 
-                      {/* Seller Information */}
-                      
+                      {/* Message Seller Button - REMOVE THIS DUPLICATE */}
+                      {/* 
+                      {user && productdata && productdata.seller_email && user.email !== productdata.seller_email && (
+                        <button
+                          className="bg-blue-600 text-white px-4 py-2 rounded ml-4"
+                          onClick={() => openChat(productdata.seller_email)}
+                        >
+                          Message Seller
+                        </button>
+                      )} 
+                      */}
                     </div>
                   </div>
                 </div>
